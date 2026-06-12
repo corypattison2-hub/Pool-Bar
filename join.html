@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1a0e07">
+<title>Join the Bar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #150d08;
+    --bg-base: #1c130c;
+    --bg-raised: #251910;
+    --bg-elevated: #2e1f14;
+    --cream: #ede2cc;
+    --cream-soft: #d8c9ad;
+    --cream-dim: #a89a82;
+    --cream-faint: #6e6453;
+    --gold: #b89656;
+    --gold-soft: #a08349;
+    --gold-bright: #d4ad6a;
+    --brass: #745f38;
+    --green: #4e6e4f;
+    --red: #8a3a3a;
+    --amber: #b8843a;
+    --border: rgba(184, 150, 86, 0.18);
+    --border-strong: rgba(184, 150, 86, 0.32);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--cream);
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(184, 150, 86, 0.05), transparent 70%),
+      linear-gradient(180deg, var(--bg-base) 0%, var(--bg-deep) 100%);
+    min-height: 100vh;
+    min-height: 100dvh;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    position: relative;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.6;
+    pointer-events: none;
+    z-index: 1;
+  }
+  main {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+  }
+  .wrap { max-width: 420px; width: 100%; animation: fadeIn 0.5s; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  .brand { text-align: center; margin-bottom: 36px; }
+  .brand .eyebrow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .brand h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 8vw, 48px);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--cream);
+  }
+  .brand .tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--cream-soft);
+    font-size: 15px;
+    margin-top: 8px;
+  }
+  .card {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 28px 24px;
+  }
+  .card h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--cream);
+    margin-bottom: 6px;
+  }
+  .card .sub {
+    color: var(--cream-dim);
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: var(--cream-dim);
+    font-weight: 500;
+  }
+  input {
+    font-family: inherit;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--border);
+    color: var(--cream);
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-size: 16px;
+    width: 100%;
+    transition: border-color 0.15s;
+  }
+  input:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+  input::placeholder { color: var(--cream-faint); }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 16px;
+    background: var(--gold-soft);
+    color: var(--bg-deep);
+  }
+  .btn:hover:not(:disabled) { background: var(--gold-bright); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .state-waiting, .state-approved, .state-error {
+    text-align: center;
+    padding: 20px 0;
+  }
+  .state-waiting .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--border-strong);
+    border-top-color: var(--gold-bright);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    animation: spin 1s linear infinite;
+  }
+  .state-waiting h2, .state-approved h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .state-waiting .pulse {
+    color: var(--gold-bright);
+    animation: pulse 1.8s infinite;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 16px;
+  }
+  .state-approved .check {
+    font-size: 48px;
+    color: var(--gold-bright);
+    margin-bottom: 12px;
+  }
+  .state-approved .sub {
+    color: var(--cream-soft);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+  }
+  .state-error h2 { color: var(--red); }
+  .footer {
+    text-align: center;
+    margin-top: 24px;
+    color: var(--cream-dim);
+    font-size: 12px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="wrap">
+    <div class="brand">
+      <div class="eyebrow">Welcome to</div>
+      <h1>The Tap House</h1>
+      <div class="tagline">Ask the bartender to let you in</div>
+    </div>
+    <div id="content">
+      <div class="card">
+        <h2>Loading…</h2>
+        <p class="sub">Just a moment.</p>
+      </div>
+    </div>
+    <div class="footer">Your name will appear on the bar's TV once approved.</div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import {
+    getAuth, signInAnonymously, onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import {
+    getFirestore, doc, getDoc, collection, addDoc, onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ========================================================
+  // FIREBASE CONFIG — SAME VALUES AS index.html
+  // ========================================================
+  const firebaseConfig = window.__FIREBASE_CONFIG__ || {
+    apiKey: "PASTE_YOUR_API_KEY",
+    authDomain: "PASTE_YOUR_AUTH_DOMAIN",
+    projectId: "PASTE_YOUR_PROJECT_ID",
+    storageBucket: "PASTE_YOUR_STORAGE_BUCKET",
+    messagingSenderId: "PASTE_YOUR_SENDER_ID",
+    appId: "PASTE_YOUR_APP_ID"
+  };
+  const isConfigured = !firebaseConfig.apiKey.startsWith("PASTE_");
+
+  const $ = (q) => document.querySelector(q);
+  const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const barCode = (urlParams.get("bar") || "").toUpperCase();
+  let db = null, user = null, requestId = null, friendsUnsub = null;
+
+  function renderForm(barName) {
+    $("#content").innerHTML = `
+      <div class="card">
+        <h2>Join ${escapeHtml(barName)}</h2>
+        <p class="sub">Enter your name to request a spot at the bar.</p>
+        <div>
+          <label>Your name (or nickname)</label>
+          <input type="text" id="name-input" placeholder="e.g. Marcus" autocomplete="given-name" autocapitalize="words" maxlength="40" />
+        </div>
+        <button class="btn" id="submit-btn" disabled>Request to join</button>
+      </div>
+    `;
+    const input = $("#name-input");
+    const btn = $("#submit-btn");
+    input.addEventListener("input", () => {
+      btn.disabled = input.value.trim().length === 0;
+    });
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !btn.disabled) btn.click();
+    });
+    btn.addEventListener("click", submitRequest);
+    setTimeout(() => input.focus(), 100);
+  }
+
+  function renderWaiting(name) {
+    $("#content").innerHTML = `
+      <div class="card">
+        <div class="state-waiting">
+          <div class="spinner"></div>
+          <h2>Hi, ${escapeHtml(name)}</h2>
+          <p class="pulse">Waiting for the bartender to wave you in…</p>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderApproved(name) {
+    $("#content").innerHTML = `
+      <div class="card">
+        <div class="state-approved">
+          <div class="check">✓</div>
+          <h2>You're in</h2>
+          <p class="sub">Welcome to the bar, ${escapeHtml(name)}.<br/>Your pints will be tracked on the leaderboard.</p>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderError(title, message) {
+    $("#content").innerHTML = `
+      <div class="card">
+        <div class="state-error">
+          <h2>${escapeHtml(title)}</h2>
+          <p class="sub">${escapeHtml(message)}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  async function submitRequest() {
+    const input = $("#name-input");
+    const btn = $("#submit-btn");
+    const name = input.value.trim();
+    if (!name) return;
+    btn.disabled = true;
+    btn.textContent = "Sending…";
+    try {
+      const requestsRef = collection(db, "bars", barCode, "requests");
+      const docRef = await addDoc(requestsRef, {
+        name,
+        requesterUid: user.uid,
+        createdAt: Date.now()
+      });
+      requestId = docRef.id;
+      sessionStorage.setItem("taphouse_request_" + barCode, JSON.stringify({ id: requestId, name }));
+      renderWaiting(name);
+      watchForApproval(name);
+    } catch (e) {
+      console.error(e);
+      btn.disabled = false;
+      btn.textContent = "Request to join";
+      showInlineError("Couldn't send request. Try again.");
+    }
+  }
+
+  function showInlineError(msg) {
+    const existing = document.querySelector(".inline-err");
+    if (existing) existing.remove();
+    const el = document.createElement("div");
+    el.className = "inline-err";
+    el.style.cssText = "margin-top: 12px; padding: 10px 12px; background: rgba(138,58,58,0.1); border: 1px solid var(--red); border-radius: 6px; color: var(--red); font-size: 13px; text-align: center;";
+    el.textContent = msg;
+    $("#submit-btn").parentNode.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
+
+  function watchForApproval(name) {
+    // Watch the bar's friends list — if a friend appears with our request ID, we've been approved.
+    // (We can't watch our own request doc directly because the bartender deletes it on approval.)
+    const barRef = doc(db, "bars", barCode);
+    friendsUnsub = onSnapshot(barRef, (snap) => {
+      if (!snap.exists()) return;
+      const data = snap.data();
+      const friends = data.friends || [];
+      // Match by stored request ID (preferred) or fall back to name+recent approval
+      const match = friends.find(f =>
+        (requestId && f.approvedFromRequest === requestId) ||
+        (f.name === name && f.approvedAt && (Date.now() - f.approvedAt) < 60_000)
+      );
+      if (match) {
+        if (friendsUnsub) friendsUnsub();
+        sessionStorage.removeItem("taphouse_request_" + barCode);
+        renderApproved(name);
+      }
+    });
+  }
+
+  async function boot() {
+    if (!barCode) {
+      renderError("No bar code", "This link is missing the bar code. Scan the QR on the bar's TV.");
+      return;
+    }
+    if (!isConfigured) {
+      renderError("Setup needed", "The app's Firebase config hasn't been added yet.");
+      return;
+    }
+    try {
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      db = getFirestore(app);
+      await new Promise((resolve, reject) => {
+        const unsub = onAuthStateChanged(auth, (u) => {
+          if (u) { user = u; unsub(); resolve(); }
+        }, reject);
+        signInAnonymously(auth).catch(reject);
+      });
+      // Verify the bar exists
+      const barSnap = await getDoc(doc(db, "bars", barCode));
+      if (!barSnap.exists()) {
+        renderError("Bar not found", "That bar code doesn't exist. Ask for the right link.");
+        return;
+      }
+      const barName = "The Tap House"; // The brand name shown — kept in sync with index.html
+      // Check if we already have a pending request
+      const saved = sessionStorage.getItem("taphouse_request_" + barCode);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          requestId = parsed.id;
+          renderWaiting(parsed.name);
+          watchForApproval(parsed.name);
+          return;
+        } catch {}
+      }
+      renderForm(barName);
+    } catch (e) {
+      console.error(e);
+      renderError("Connection failed", "Couldn't reach the bar. Check your connection.");
+    }
+  }
+  boot();
+</script>
+</body>
+</html>
