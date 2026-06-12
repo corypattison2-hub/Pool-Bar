@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%BA%3C/text%3E%3C/svg%3E">
-</head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#1a0e07">
@@ -373,12 +371,32 @@
     text-align: center;
   }
   .lb-row.leader .lb-rank { color: var(--gold-bright); font-weight: 600; }
+  .lb-name-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
   .lb-name {
     font-family: 'Cormorant Garamond', serif;
     font-size: 24px;
     font-weight: 500;
     color: var(--cream);
     line-height: 1;
+  }
+  .bartender-tag {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--gold-bright);
+    padding: 3px 8px;
+    border: 1px solid var(--gold-soft);
+    border-radius: 3px;
+    background: rgba(184, 150, 86, 0.08);
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    line-height: 1.2;
+    flex-shrink: 0;
   }
   .lb-bar-track {
     margin-top: 10px;
@@ -1308,6 +1326,89 @@
     animation: softPulse 1.8s infinite;
   }
 
+  /* === Invite modal === */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(10, 6, 3, 0.86);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 900;
+    animation: fadeIn 0.25s;
+    backdrop-filter: blur(6px);
+    padding: 20px;
+  }
+  .modal {
+    max-width: 380px; width: 100%;
+    background: var(--bg-raised);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    padding: 28px 24px;
+    text-align: center;
+    animation: scaleIn 0.3s;
+  }
+  .modal h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--cream);
+    margin-bottom: 6px;
+  }
+  .modal .sub {
+    font-size: 13px;
+    color: var(--cream-dim);
+    margin-bottom: 18px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+  .modal-qr {
+    width: 220px;
+    height: 220px;
+    margin: 0 auto 16px;
+    background: var(--cream);
+    padding: 14px;
+    border-radius: 8px;
+    box-sizing: content-box;
+  }
+  .modal-qr img, .modal-qr svg { width: 100%; height: 100%; display: block; }
+  .modal-expiry {
+    font-size: 12px;
+    color: var(--amber);
+    margin-bottom: 16px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+  .modal-actions {
+    display: grid;
+    gap: 8px;
+  }
+
+  /* Pick-your-patron prompt */
+  .link-prompt {
+    margin-bottom: 14px;
+    padding: 14px;
+    background: rgba(184, 150, 86, 0.1);
+    border: 1px solid var(--gold-soft);
+    border-radius: 8px;
+  }
+  .link-prompt .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .link-prompt .label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gold-bright);
+  }
+  .link-prompt .desc {
+    font-size: 12px;
+    color: var(--cream-soft);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    margin-bottom: 12px;
+  }
+
   /* Config warning */
   .config-warning {
     margin-top: 32px;
@@ -1453,7 +1554,7 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
     { id: "k4", tap: 4, name: "Kilkenny",         brewery: "Kilkenny",         style: "Cream Ale", size: "sixth", remainingOz: 661,  costCents: 14000 }
   ];
   const ACHIEVEMENTS = [
-    { id: "first_pour",   name: "First Pour",   desc: "Welcome to the Pool Ba",   icon: "🍺" },
+    { id: "first_pour",   name: "First Pour",   desc: "Welcome to the snug",   icon: "🍺" },
     { id: "half_century", name: "Half Century", desc: "50 lifetime pints",     icon: "🎯" },
     { id: "century",      name: "Century Club", desc: "100 lifetime pints",    icon: "💯" },
     { id: "regular",      name: "The Regular",  desc: "5 sessions attended",   icon: "🎖️" },
@@ -1484,7 +1585,9 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
     activeTab: "pour",
     editingFriendId: null,
     addingFriend: false,
-    editingKegId: null
+    editingKegId: null,
+    inviteModal: null, // { inviteId, url, expiresAt }
+    pickingPatron: false // bartender hasn't linked their patron yet
   };
   const REQUEST_EXPIRY_MS = 30 * 60 * 1000; // 30 minutes
 
@@ -1887,7 +1990,8 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
       kegs: DEFAULT_KEGS,
       sessions: [],
       currentSessionId: null,
-      bartenderUid: State.user.uid,
+      bartenderUids: [State.user.uid],
+      bartenderPatronIds: {}, // map of uid → friend.id (filled in when bartender picks their patron)
       createdAt: Date.now()
     };
     await setDoc(doc(State.db, "bars", code), initial);
@@ -1909,7 +2013,24 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
       const data = snap.data();
       const prev = State.barData;
       State.barData = data;
-      State.isBartender = data.bartenderUid === State.user.uid;
+
+      // Determine bartender membership. Support both schemas:
+      //   - new: data.bartenderUids = [uid, uid, ...]
+      //   - old: data.bartenderUid = "uid" (single)
+      const uids = Array.isArray(data.bartenderUids)
+        ? data.bartenderUids
+        : (data.bartenderUid ? [data.bartenderUid] : []);
+      State.isBartender = uids.includes(State.user.uid);
+
+      // One-time migration: if the bar is on the old schema and we're the bartender,
+      // upgrade it to the new array form so co-bartender invites work.
+      if (!Array.isArray(data.bartenderUids) && data.bartenderUid === State.user.uid) {
+        updateDoc(doc(State.db, "bars", State.barCode), {
+          bartenderUids: [data.bartenderUid],
+          bartenderPatronIds: data.bartenderPatronIds || {}
+        }).catch(e => console.warn("Migration failed:", e));
+      }
+
       if (State.role === "tv" && prev) {
         const oldSession = prev.sessions.find(s => s.id === prev.currentSessionId);
         const newSession = data.sessions.find(s => s.id === data.currentSessionId);
@@ -1921,7 +2042,6 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
         const oldIds = new Set((prev.friends || []).map(f => f.id));
         const newPatrons = (data.friends || []).filter(f => !oldIds.has(f.id));
         newPatrons.forEach(f => {
-          // Only show welcome for newly-approved patrons (carry an `approvedAt` flag)
           if (f.approvedAt && !State.seenApprovals.has(f.id)) {
             State.seenApprovals.add(f.id);
             showWelcomeOverlay(f);
@@ -1993,6 +2113,104 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
     if (!State.isBartender) return;
     try { await deleteDoc(doc(State.db, "bars", State.barCode, "requests", requestId)); } catch (e) { console.warn(e); }
     showToast("Request dismissed", "info");
+  }
+
+  // ========================================================
+  // CO-BARTENDER INVITES
+  // ========================================================
+  const INVITE_EXPIRY_MS = 15 * 60 * 1000; // 15 minutes
+
+  async function createInvite() {
+    if (!State.isBartender) return null;
+    try {
+      const invitesRef = collection(State.db, "bars", State.barCode, "invites");
+      const docRef = await addDoc(invitesRef, {
+        createdAt: Date.now(),
+        createdBy: State.user.uid,
+        expiresAt: Date.now() + INVITE_EXPIRY_MS,
+        consumed: false
+      });
+      return docRef.id;
+    } catch (e) {
+      console.error("createInvite failed:", e);
+      showToast("Couldn't create invite", "warn");
+      return null;
+    }
+  }
+
+  // The claim flow runs from a special URL: /?join=<barCode>&invite=<inviteId>
+  // This is detected on boot and routes through claimInvite() instead of the normal splash.
+  async function claimInvite(barCode, inviteId) {
+    try {
+      // Read the invite
+      const inviteRef = doc(State.db, "bars", barCode, "invites", inviteId);
+      const inviteSnap = await getDoc(inviteRef);
+      if (!inviteSnap.exists()) throw new Error("Invite not found or already used");
+      const invite = inviteSnap.data();
+      if (invite.consumed) throw new Error("That invite has already been used");
+      if (invite.expiresAt < Date.now()) throw new Error("That invite has expired");
+
+      // Read the bar
+      const barRef = doc(State.db, "bars", barCode);
+      const barSnap = await getDoc(barRef);
+      if (!barSnap.exists()) throw new Error("Bar not found");
+      const bar = barSnap.data();
+      const existingUids = Array.isArray(bar.bartenderUids)
+        ? bar.bartenderUids
+        : (bar.bartenderUid ? [bar.bartenderUid] : []);
+      if (existingUids.includes(State.user.uid)) {
+        // Already a bartender — just join the bar
+        localStorage.setItem("taphouse_barCode", barCode);
+        State.barCode = barCode;
+        subscribeBar();
+        return { ok: true, alreadyBartender: true };
+      }
+      // Add us to bartenders
+      const newUids = [...existingUids, State.user.uid];
+      await updateDoc(barRef, { bartenderUids: newUids });
+      // Mark invite as consumed
+      try { await deleteDoc(inviteRef); } catch {}
+      localStorage.setItem("taphouse_barCode", barCode);
+      State.barCode = barCode;
+      subscribeBar();
+      return { ok: true };
+    } catch (e) {
+      console.error("claimInvite failed:", e);
+      return { ok: false, error: e.message || String(e) };
+    }
+  }
+
+  // Helper: which patron is *this* bartender's avatar?
+  function getMyPatronId() {
+    if (!State.barData || !State.isBartender) return null;
+    const map = State.barData.bartenderPatronIds || {};
+    return map[State.user.uid] || null;
+  }
+  async function setMyPatronId(friendId) {
+    if (!State.isBartender) return;
+    await updateBar(d => {
+      const map = { ...(d.bartenderPatronIds || {}) };
+      map[State.user.uid] = friendId;
+      return { bartenderPatronIds: map };
+    });
+  }
+  // Which bartenders are at the bar right now (returns array of {uid, friendId, friendName})
+  function getBartenderRoster() {
+    if (!State.barData) return [];
+    const uids = Array.isArray(State.barData.bartenderUids)
+      ? State.barData.bartenderUids
+      : (State.barData.bartenderUid ? [State.barData.bartenderUid] : []);
+    const map = State.barData.bartenderPatronIds || {};
+    return uids.map(uid => {
+      const friendId = map[uid];
+      const friend = friendId ? State.barData.friends.find(f => f.id === friendId) : null;
+      return { uid, friendId, friendName: friend?.name || null };
+    });
+  }
+  // Is a given patron ID one of the bartenders?
+  function isPatronABartender(friendId) {
+    const roster = getBartenderRoster();
+    return roster.some(b => b.friendId === friendId);
   }
 
   // ========================================================
@@ -2132,6 +2350,18 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
       app.innerHTML = `<div class="app-bg grain loading"><div class="loading-text">Loading bar…</div></div>`;
       return;
     }
+    // Suppress re-renders while the user is in the middle of editing a form.
+    // Otherwise background data updates (a guest joining, a pour from the TV listener)
+    // would wipe out the in-progress text input. We still mark dirty so a final
+    // render runs once the user closes the form.
+    if (State.role === "phone" && (State.addingFriend || State.editingFriendId || State.editingKegId)) {
+      // Allow the first render that opens the form; suppress subsequent ones.
+      if ($("#ff-save") || $("#kf-update") || $("#kf-swap")) {
+        State.pendingRerender = true;
+        return;
+      }
+    }
+    State.pendingRerender = false;
     if (State.role === "tv") {
       app.innerHTML = renderTV();
       attachTVHandlers();
@@ -2336,26 +2566,32 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
     const container = $("#tv-qr-img");
     if (!container || !State.barCode) return;
     const joinUrl = `${window.location.origin}/join.html?bar=${encodeURIComponent(State.barCode)}`;
-    container.innerHTML = "";
+    renderQRInto(container, joinUrl, 110);
+  }
 
-    // Strategy: try a hosted QR image API first (most reliable), and if that fails to load,
-    // fall back to an inline-generated SVG. If even that fails, show the URL as text.
-    const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=110x110&margin=4&data=${encodeURIComponent(joinUrl)}&bgcolor=ede2cc&color=1a0e07`;
+  function renderInviteQR(url) {
+    const container = $("#invite-qr");
+    if (!container) return;
+    renderQRInto(container, url, 220);
+  }
+
+  function renderQRInto(container, url, size) {
+    container.innerHTML = "";
+    const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&margin=4&data=${encodeURIComponent(url)}&bgcolor=ede2cc&color=1a0e07`;
     const img = document.createElement("img");
     img.src = apiUrl;
-    img.width = 110; img.height = 110;
-    img.alt = "Scan to join";
+    img.width = size; img.height = size;
+    img.alt = "Scan QR";
     img.style.display = "block";
     img.onerror = () => {
-      // Image API failed (network blocked or down) — try inline SVG generator
       try {
-        const svg = generateQRSvg(joinUrl, {
-          size: 110, dark: "#1a0e07", light: "#ede2cc", margin: 2
+        const svg = generateQRSvg(url, {
+          size, dark: "#1a0e07", light: "#ede2cc", margin: 2
         });
         container.innerHTML = svg;
       } catch (e) {
         console.warn("Both QR methods failed:", e);
-        container.innerHTML = `<div style="font-size: 9px; color: #1a0e07; padding: 6px; word-break: break-all;">${escapeHtml(joinUrl)}</div>`;
+        container.innerHTML = `<div style="font-size: 9px; color: #1a0e07; padding: 6px; word-break: break-all;">${escapeHtml(url)}</div>`;
       }
     };
     container.appendChild(img);
@@ -2388,12 +2624,16 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
           ${ranked.map((f, i) => {
             const widthPct = (f.tonight / maxTonight) * 100;
             const isLeader = i === 0 && f.tonight > 0;
+            const isBart = isPatronABartender(f.id);
             return `
               <div class="lb-row${isLeader ? " leader" : ""}" style="animation: slideUp 0.4s ${i * 0.06}s both;">
                 <div class="lb-rank num">${i + 1}</div>
                 ${monogram(f.name, "lg", isLeader)}
                 <div>
-                  <div class="lb-name">${escapeHtml(f.name)}</div>
+                  <div class="lb-name-row">
+                    <div class="lb-name">${escapeHtml(f.name)}</div>
+                    ${isBart ? '<span class="bartender-tag" title="Bartender for tonight">Bartender</span>' : ''}
+                  </div>
                   <div class="lb-bar-track"><div class="lb-bar-fill" style="width: ${widthPct}%; animation-delay: ${i * 0.08}s;"></div></div>
                 </div>
                 <div class="lb-num-block">
@@ -2595,7 +2835,7 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
         <div class="phone-header">
           <div class="top">
             <div style="min-width: 0;">
-              <h1>${State.isBartender ? "Barkeep's Book" : "The Pool Bar"}</h1>
+              <h1>${State.isBartender ? "Barkeep's Book" : "The Snug"}</h1>
               <div class="status ${session ? "live" : ""}"><span class="dot"></span>${session ? "Active session" : "No session"}</div>
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
@@ -2612,6 +2852,23 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
           ${renderTab("history", "Log", "history")}
         </div>
         <div class="tab-content">${body}</div>
+        ${State.inviteModal ? renderInviteModal() : ''}
+      </div>
+    `;
+  }
+  function renderInviteModal() {
+    const minsLeft = Math.max(0, Math.ceil((State.inviteModal.expiresAt - Date.now()) / 60000));
+    return `
+      <div class="modal-backdrop" id="invite-backdrop">
+        <div class="modal">
+          <h3>Invite a co-bartender</h3>
+          <div class="sub">Have them scan this with their phone camera</div>
+          <div class="modal-qr" id="invite-qr"></div>
+          <div class="modal-expiry">Expires in ${minsLeft} minute${minsLeft === 1 ? '' : 's'}</div>
+          <div class="modal-actions">
+            <button class="btn btn-ghost" id="btn-close-invite">Done</button>
+          </div>
+        </div>
       </div>
     `;
   }
@@ -2737,23 +2994,50 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
       const target = State.editingFriendId ? State.barData.friends.find(f => f.id === State.editingFriendId) : null;
       return renderFriendForm(target);
     }
+    const myPatronId = getMyPatronId();
+    const roster = getBartenderRoster();
     return `
+      ${myPatronId ? '' : renderPickPatronPrompt()}
       ${renderPendingRequestsSection()}
-      <button class="btn btn-primary" id="btn-add-friend" style="width: 100%; margin-bottom: 16px;">${icon("plus")}Add patron</button>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+        <button class="btn btn-primary" id="btn-add-friend">${icon("plus")}Add patron</button>
+        <button class="btn btn-ghost" id="btn-invite-bartender">${icon("plus")}Invite bartender</button>
+      </div>
       ${State.barData.friends.map(f => {
         const stats = computeFriendStats(f.id);
         const earned = getEarnedAchievements(f.id);
+        const isBart = roster.some(b => b.friendId === f.id);
+        const isMe = f.id === myPatronId;
         return `
           <div class="friend-row">
-            ${monogram(f.name, "md")}
+            ${monogram(f.name, "md", isMe)}
             <div class="info">
-              <div class="nm">${escapeHtml(f.name)}</div>
+              <div class="nm">
+                ${escapeHtml(f.name)}
+                ${isBart ? '<span class="bartender-tag" style="margin-left: 6px; font-size: 9px; padding: 2px 6px;">Bartender</span>' : ''}
+              </div>
               <div class="meta">${stats.lifetime} lifetime · ${stats.sessionsAttended} sessions · ${earned.length} honours</div>
             </div>
             <button class="icon-btn" data-edit-friend="${f.id}">${icon("edit")}</button>
           </div>
         `;
       }).join("")}
+    `;
+  }
+
+  function renderPickPatronPrompt() {
+    return `
+      <div class="link-prompt">
+        <div class="head">
+          <div class="label">Which patron are you?</div>
+        </div>
+        <div class="desc">Tag yourself so the "Bartender" label shows next to your name on the TV.</div>
+        <select id="my-patron-select" style="margin-bottom: 8px;">
+          <option value="">Pick a patron…</option>
+          ${State.barData.friends.map(f => `<option value="${f.id}">${escapeHtml(f.name)}</option>`).join("")}
+        </select>
+        <button class="btn btn-primary" id="btn-link-patron" style="width: 100%;" disabled>Tag me</button>
+      </div>
     `;
   }
 
@@ -2961,6 +3245,51 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
       el.addEventListener("click", () => { State.editingFriendId = el.dataset.editFriend; render(); });
     });
 
+    // Invite co-bartender
+    $("#btn-invite-bartender")?.addEventListener("click", async () => {
+      const btn = $("#btn-invite-bartender");
+      btn.disabled = true;
+      const inviteId = await createInvite();
+      btn.disabled = false;
+      if (!inviteId) return;
+      const url = `${window.location.origin}/?join=${encodeURIComponent(State.barCode)}&invite=${encodeURIComponent(inviteId)}`;
+      State.inviteModal = { inviteId, url, expiresAt: Date.now() + INVITE_EXPIRY_MS };
+      render();
+      // Render the QR inside the modal after render
+      setTimeout(() => renderInviteQR(url), 0);
+    });
+    $("#btn-close-invite")?.addEventListener("click", () => {
+      State.inviteModal = null;
+      render();
+    });
+    $("#invite-backdrop")?.addEventListener("click", (e) => {
+      if (e.target.id === "invite-backdrop") {
+        State.inviteModal = null;
+        render();
+      }
+    });
+    // Re-render the QR if the modal is currently visible (after a render cycle)
+    if (State.inviteModal) {
+      setTimeout(() => renderInviteQR(State.inviteModal.url), 0);
+    }
+
+    // Pick-your-patron
+    const patronSelect = $("#my-patron-select");
+    const linkBtn = $("#btn-link-patron");
+    if (patronSelect && linkBtn) {
+      patronSelect.addEventListener("change", () => {
+        linkBtn.disabled = !patronSelect.value;
+      });
+      linkBtn.addEventListener("click", async () => {
+        const friendId = patronSelect.value;
+        if (!friendId) return;
+        linkBtn.disabled = true;
+        await setMyPatronId(friendId);
+        showToast("Tagged. You'll show as Bartender on the TV.", "success");
+        render();
+      });
+    }
+
     // Pending request handlers
     document.querySelectorAll("[data-approve]").forEach(el => {
       el.addEventListener("click", async () => {
@@ -3037,6 +3366,45 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
     if (!isConfigured) { render(); return; }
     const ok = await initFirebase();
     if (!ok) { $("#app").innerHTML = renderConfigWarning(); return; }
+
+    // Check for invite-claim URL: ?join=<barCode>&invite=<inviteId>
+    const params = new URLSearchParams(window.location.search);
+    const joinBar = params.get("join");
+    const joinInvite = params.get("invite");
+    if (joinBar && joinInvite) {
+      // Show a claim splash while we process
+      $("#app").innerHTML = `
+        <div class="app-bg grain splash">
+          <div class="splash-inner">
+            <div class="brand">
+              <div class="eyebrow">Welcome to</div>
+              <h1 class="serif">The Pool Bar</h1>
+              <div class="tagline">Becoming a bartender…</div>
+            </div>
+            <div class="card" id="claim-status">
+              <h2 class="serif">Just a moment</h2>
+              <p class="sub" style="margin-bottom: 0;">Claiming your invite…</p>
+            </div>
+          </div>
+        </div>
+      `;
+      const result = await claimInvite(joinBar.toUpperCase(), joinInvite);
+      // Clean the URL so a refresh doesn't re-claim
+      try { window.history.replaceState({}, "", window.location.pathname); } catch {}
+      if (!result.ok) {
+        $("#claim-status").innerHTML = `
+          <h2 class="serif" style="color: var(--red);">Couldn't join</h2>
+          <p class="sub">${escapeHtml(result.error)}</p>
+          <button class="btn btn-primary" style="width: 100%; margin-top: 12px;" onclick="window.location.href = window.location.origin">Back to start</button>
+        `;
+        return;
+      }
+      // Success — subscribeBar was already called inside claimInvite
+      showToast(result.alreadyBartender ? "You're already a bartender here" : "You're now a bartender. Welcome!", "success");
+      // Wait for snapshot, render handles the rest
+      return;
+    }
+
     const savedCode = localStorage.getItem("taphouse_barCode");
     if (savedCode) {
       State.barCode = savedCode;
