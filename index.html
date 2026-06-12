@@ -2007,24 +2007,32 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
     renderQRCode();
   }
 
-  function renderQRCode() {
+function renderQRCode() {
     const container = $("#tv-qr-img");
     if (!container || !State.barCode) return;
-    // Build the join URL — same origin, /join.html with the bar code
     const joinUrl = `${window.location.origin}/join.html?bar=${encodeURIComponent(State.barCode)}`;
-    container.innerHTML = ""; // Clear previous
-    if (typeof QRCode !== "undefined" && QRCode.toCanvas) {
-      const canvas = document.createElement("canvas");
-      container.appendChild(canvas);
-      QRCode.toCanvas(canvas, joinUrl, {
-        width: 110,
-        margin: 1,
-        color: { dark: "#1a0e07", light: "#ede2cc" }
-      }, (err) => { if (err) console.warn("QR render error:", err); });
-    } else {
-      // Fallback: show the URL as text
-      container.innerHTML = `<div style="font-size: 9px; color: #1a0e07; padding: 6px;">${escapeHtml(joinUrl)}</div>`;
-    }
+    container.innerHTML = "";
+    
+    const tryDraw = (attemptsLeft) => {
+      if (typeof QRCode !== "undefined" && QRCode.toCanvas) {
+        const canvas = document.createElement("canvas");
+        container.innerHTML = "";
+        container.appendChild(canvas);
+        QRCode.toCanvas(canvas, joinUrl, {
+          width: 110,
+          margin: 1,
+          color: { dark: "#1a0e07", light: "#ede2cc" }
+        }, (err) => { if (err) console.warn("QR render error:", err); });
+      } else if (attemptsLeft > 0) {
+        // Library still loading — show "Loading QR…" placeholder and retry
+        container.innerHTML = `<div style="font-size: 11px; color: #1a0e07; padding: 40px 6px; text-align: center; font-style: italic;">Loading QR…</div>`;
+        setTimeout(() => tryDraw(attemptsLeft - 1), 500);
+      } else {
+        // Final fallback: show the URL as text
+        container.innerHTML = `<div style="font-size: 9px; color: #1a0e07; padding: 6px; word-break: break-all;">${escapeHtml(joinUrl)}</div>`;
+      }
+    };
+    tryDraw(10); // Try for up to 5 seconds
   }
 
   function tvHeading(eyebrow, title, sub) {
