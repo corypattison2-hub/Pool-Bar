@@ -1209,13 +1209,13 @@ import { initializeApp } from "firebase/app";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
-  authDomain: "pool-bar-57de0.firebaseapp.com",
-  projectId: "pool-bar-57de0",
-  storageBucket: "pool-bar-57de0.firebasestorage.app",
-  messagingSenderId: "91450372438",
-  appId: "1:91450372438:web:1f3599fe22e734b0e2e6f7"
+const firebaseConfig = window.__FIREBASE_CONFIG__ || {
+    apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
+    authDomain: "pool-bar-57de0.firebaseapp.com",
+    projectId: "pool-bar-57de0",
+    storageBucket: "pool-bar-57de0.firebasestorage.app",
+    messagingSenderId: "91450372438",
+    appId: "1:91450372438:web:1f3599fe22e734b0e2e6f7"
 };
 
 // Initialize Firebase
