@@ -1,0 +1,2326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1a0e07">
+<title>The Tap House</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Warm Irish pub palette — refined, less saturated */
+    --bg-deep: #150d08;
+    --bg-base: #1c130c;
+    --bg-raised: #251910;
+    --bg-elevated: #2e1f14;
+    --bg-hover: #382519;
+
+    --cream: #ede2cc;
+    --cream-soft: #d8c9ad;
+    --cream-dim: #a89a82;
+    --cream-faint: #6e6453;
+
+    --gold: #b89656;
+    --gold-soft: #a08349;
+    --gold-bright: #d4ad6a;
+    --brass: #745f38;
+
+    --green: #4e6e4f;
+    --red: #8a3a3a;
+    --amber: #b8843a;
+
+    --border: rgba(184, 150, 86, 0.18);
+    --border-strong: rgba(184, 150, 86, 0.32);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--cream);
+    background: var(--bg-deep);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .app-bg {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(184, 150, 86, 0.05), transparent 70%),
+      linear-gradient(180deg, var(--bg-base) 0%, var(--bg-deep) 100%);
+    min-height: 100vh;
+    min-height: 100dvh;
+    position: relative;
+  }
+
+  .grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.6;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .app-bg > * { position: relative; z-index: 2; }
+
+  .serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+  .num { font-variant-numeric: tabular-nums; font-feature-settings: 'tnum'; }
+
+  /* === Type system === */
+  h1, h2, h3 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; color: var(--cream); }
+  .eyebrow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--cream-dim);
+    font-weight: 500;
+  }
+  .meta { font-size: 13px; color: var(--cream-dim); }
+
+  /* === Animations === */
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes scaleIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+  @keyframes fillBar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @keyframes softPulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+  }
+
+  /* === Buttons === */
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: inherit;
+  }
+  button:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+  }
+  .btn-primary {
+    background: var(--gold-soft);
+    color: var(--bg-deep);
+    border-color: var(--gold-soft);
+  }
+  .btn-primary:hover:not(:disabled) { background: var(--gold-bright); border-color: var(--gold-bright); }
+  .btn-ghost {
+    color: var(--cream);
+    border-color: var(--border-strong);
+    background: transparent;
+  }
+  .btn-ghost:hover:not(:disabled) { background: rgba(184, 150, 86, 0.08); border-color: var(--gold); }
+  .btn-danger {
+    color: var(--red);
+    border-color: rgba(138, 58, 58, 0.4);
+    background: transparent;
+  }
+  .btn-danger:hover:not(:disabled) { background: rgba(138, 58, 58, 0.1); border-color: var(--red); }
+
+  /* === Inputs === */
+  input, select {
+    font-family: inherit;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--border);
+    color: var(--cream);
+    padding: 11px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 100%;
+    transition: border-color 0.15s;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+  input::placeholder { color: var(--cream-faint); }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--brass); border-radius: 4px; }
+
+  /* === Monogram === */
+  .mono {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    color: var(--cream);
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    flex-shrink: 0;
+    user-select: none;
+  }
+  .mono.sm { width: 36px; height: 36px; font-size: 15px; }
+  .mono.md { width: 48px; height: 48px; font-size: 20px; }
+  .mono.lg { width: 64px; height: 64px; font-size: 26px; }
+  .mono.xl { width: 96px; height: 96px; font-size: 40px; }
+  .mono.xxl { width: 140px; height: 140px; font-size: 56px; }
+  .mono.gold { background: var(--gold-soft); color: var(--bg-deep); border-color: var(--gold); }
+
+  /* === App shell === */
+  #app { min-height: 100vh; min-height: 100dvh; }
+
+  /* === Splash === */
+  .splash {
+    display: flex; align-items: center; justify-content: center;
+    padding: 32px 20px;
+    min-height: 100vh; min-height: 100dvh;
+  }
+  .splash-inner { max-width: 460px; width: 100%; animation: fadeIn 0.6s; }
+
+  .brand { text-align: center; margin-bottom: 48px; }
+  .brand .eyebrow { color: var(--gold); margin-bottom: 12px; }
+  .brand h1 {
+    font-size: clamp(44px, 7vw, 56px);
+    line-height: 1.05;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .brand .tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--cream-soft);
+    font-size: 16px;
+    margin-top: 8px;
+  }
+
+  .card {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+  }
+  .card h2 { font-size: 22px; font-weight: 500; margin-bottom: 6px; }
+  .card .sub { color: var(--cream-dim); font-size: 14px; margin-bottom: 20px; }
+
+  .field { margin-bottom: 16px; }
+  .field label { display: block; margin-bottom: 6px; font-size: 12px; color: var(--cream-dim); font-weight: 500; }
+  .field .row { display: flex; gap: 8px; }
+  .field .row > input { flex: 1; }
+
+  .divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 24px 0;
+    color: var(--cream-faint); font-size: 12px;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  .info-note {
+    margin-top: 20px;
+    padding: 12px 14px;
+    background: rgba(184, 150, 86, 0.06);
+    border-left: 2px solid var(--gold);
+    border-radius: 0 4px 4px 0;
+    font-size: 13px;
+    color: var(--cream-soft);
+    line-height: 1.55;
+  }
+
+  .help-text {
+    margin-top: 32px;
+    text-align: center;
+    color: var(--cream-dim);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  /* === Role selector === */
+  .bar-code-display {
+    text-align: center;
+    margin-bottom: 32px;
+    padding: 20px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .bar-code-display .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--cream-dim); }
+  .bar-code-display .code {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    color: var(--gold-bright);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    margin-top: 6px;
+  }
+  .bar-code-display .role { font-size: 12px; color: var(--cream-soft); margin-top: 8px; font-style: italic; }
+
+  .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 500px) { .mode-grid { grid-template-columns: 1fr; } }
+  .mode-card {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 28px 20px;
+    text-align: center;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .mode-card:hover { background: var(--bg-elevated); border-color: var(--gold-soft); transform: translateY(-1px); }
+  .mode-card .icon-wrap {
+    width: 48px; height: 48px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gold-bright);
+  }
+  .mode-card .icon-wrap svg { width: 28px; height: 28px; }
+  .mode-card .label { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--cream); }
+  .mode-card .sub { font-size: 12px; color: var(--cream-dim); }
+
+  /* === TV View === */
+  .tv-shell { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+  .tv-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 40px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tv-brand { display: flex; align-items: baseline; gap: 16px; }
+  .tv-brand h1 {
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .tv-status {
+    font-size: 12px;
+    color: var(--cream-dim);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tv-status .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--cream-faint);
+  }
+  .tv-status.live .dot { background: var(--green); animation: softPulse 2s infinite; }
+
+  .pagination { display: flex; gap: 6px; align-items: center; }
+  .page-dot {
+    width: 8px; height: 8px;
+    background: var(--border-strong);
+    border-radius: 50%;
+    transition: all 0.4s;
+  }
+  .page-dot.active { background: var(--gold-bright); width: 24px; border-radius: 4px; }
+
+  .tv-content { flex: 1; padding: 40px; animation: fadeIn 0.5s; }
+
+  /* TV section heading */
+  .tv-heading { margin-bottom: 32px; }
+  .tv-heading .eyebrow { color: var(--gold); margin-bottom: 6px; }
+  .tv-heading h2 {
+    font-size: 40px;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  .tv-heading .sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--cream-dim);
+    font-size: 17px;
+    margin-top: 4px;
+  }
+
+  /* Leaderboard */
+  .leaderboard { display: grid; gap: 10px; }
+  .lb-row {
+    display: grid;
+    grid-template-columns: 40px 64px 1fr auto auto;
+    align-items: center;
+    gap: 24px;
+    padding: 16px 24px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+  .lb-row.leader {
+    background: linear-gradient(90deg, rgba(184, 150, 86, 0.12), var(--bg-raised) 60%);
+    border-color: var(--gold-soft);
+  }
+  .lb-rank {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: var(--cream-faint);
+    font-weight: 500;
+    text-align: center;
+  }
+  .lb-row.leader .lb-rank { color: var(--gold-bright); font-weight: 600; }
+  .lb-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--cream);
+    line-height: 1;
+  }
+  .lb-bar-track {
+    margin-top: 10px;
+    height: 4px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .lb-bar-fill {
+    height: 100%;
+    background: var(--gold-soft);
+    transform-origin: left;
+    animation: fillBar 0.9s ease-out both;
+    border-radius: 2px;
+  }
+  .lb-row.leader .lb-bar-fill { background: var(--gold-bright); }
+  .lb-num-block { text-align: right; }
+  .lb-num-block .value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 44px;
+    color: var(--gold-bright);
+    font-weight: 500;
+    line-height: 1;
+  }
+  .lb-num-block .label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--cream-faint);
+    margin-top: 4px;
+  }
+  .lb-lifetime {
+    text-align: right;
+    border-left: 1px solid var(--border);
+    padding-left: 24px;
+  }
+  .lb-lifetime .value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: var(--cream-dim);
+    font-weight: 500;
+  }
+
+  /* Kegs */
+  .keg-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .keg-card {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 22px;
+    transition: border-color 0.2s;
+  }
+  .keg-card.low { border-color: var(--amber); }
+  .keg-card.empty { border-color: var(--red); opacity: 0.85; }
+
+  .keg-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+  .tap-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+  }
+  .keg-pill {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+  .keg-pill.low { color: var(--amber); background: rgba(184, 132, 58, 0.12); }
+  .keg-pill.empty { color: var(--red); background: rgba(138, 58, 58, 0.15); }
+
+  .keg-name { font-size: 22px; font-weight: 500; line-height: 1.15; margin-bottom: 4px; }
+  .keg-meta { font-size: 13px; color: var(--cream-dim); font-style: italic; font-family: 'Cormorant Garamond', serif; }
+
+  .keg-visual {
+    margin-top: 18px;
+    height: 50px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border);
+  }
+  .keg-visual .fill {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(180deg, #d6a85a 0%, #b88846 60%, #785528 100%);
+    transition: height 0.8s ease-out;
+  }
+  .keg-visual .fill::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: rgba(237, 226, 204, 0.5);
+    border-radius: 2px 2px 0 0;
+  }
+  .keg-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--cream-dim);
+  }
+  .keg-stats .pct { color: var(--gold-bright); font-weight: 600; }
+
+  /* Stats */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 800px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .stat-block {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+  }
+  .stat-block .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--cream-dim);
+    margin-bottom: 8px;
+  }
+  .stat-block .value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px;
+    line-height: 1;
+    color: var(--gold-bright);
+    font-weight: 500;
+  }
+  .stat-block .sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--cream-dim);
+    margin-top: 6px;
+  }
+
+  .stat-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  @media (max-width: 800px) { .stat-pair { grid-template-columns: 1fr; } }
+  .panel {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 22px;
+  }
+  .panel h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 18px;
+  }
+  .pop-row { margin-bottom: 14px; }
+  .pop-row .head {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 14px;
+  }
+  .pop-row .head .nm { color: var(--cream); }
+  .pop-row .head .ct { color: var(--gold-bright); font-weight: 600; }
+  .pop-row .track { height: 3px; background: rgba(0,0,0,0.4); border-radius: 2px; }
+  .pop-row .fill { height: 100%; background: var(--gold-soft); border-radius: 2px; transition: width 0.6s; }
+
+  .ledger { display: flex; flex-direction: column; gap: 12px; }
+  .ledger-row { display: flex; justify-content: space-between; align-items: baseline; }
+  .ledger-row .l { font-size: 13px; color: var(--cream-dim); font-family: 'Cormorant Garamond', serif; font-style: italic; }
+  .ledger-row .v { font-family: 'Cormorant Garamond', serif; font-size: 17px; color: var(--cream); font-weight: 500; }
+  .ledger-row.total { border-top: 1px solid var(--border); padding-top: 14px; margin-top: 4px; }
+  .ledger-row.total .v { font-size: 22px; color: var(--gold-bright); font-weight: 600; }
+
+  /* Achievements */
+  .ach-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+  }
+  .ach-card {
+    background: var(--bg-raised);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .ach-icon {
+    font-size: 32px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(184, 150, 86, 0.08);
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .ach-info { flex: 1; min-width: 0; }
+  .ach-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gold-bright);
+    line-height: 1.1;
+  }
+  .ach-desc {
+    font-size: 12px;
+    color: var(--cream-dim);
+    margin-top: 2px;
+  }
+  .ach-who {
+    font-size: 13px;
+    color: var(--cream);
+    margin-top: 8px;
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .empty-state {
+    text-align: center;
+    margin-top: 60px;
+    padding: 40px;
+    color: var(--cream-dim);
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+  }
+
+  /* Now Pouring overlay */
+  .pouring-overlay {
+    position: fixed; inset: 0;
+    background: rgba(21, 13, 8, 0.92);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s;
+    backdrop-filter: blur(6px);
+  }
+  .pouring-card {
+    background: var(--bg-raised);
+    border: 1px solid var(--gold-soft);
+    border-radius: 12px;
+    padding: 56px 64px;
+    text-align: center;
+    animation: scaleIn 0.4s;
+    min-width: 420px;
+    max-width: 90vw;
+  }
+  .pouring-card.kill { border-color: var(--red); }
+  .pouring-card .slayer-tag {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--red);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .pouring-card .mono-wrap { display: flex; justify-content: center; margin-bottom: 16px; }
+  .pouring-card .eyebrow { color: var(--gold); margin-bottom: 10px; }
+  .pouring-card .name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    color: var(--cream);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  .pouring-card .pour-line {
+    margin-top: 12px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--gold-bright);
+  }
+
+  /* === Phone view === */
+  .phone-wrap {
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  .phone-header {
+    padding: 18px 18px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .phone-header .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .phone-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--cream);
+    line-height: 1.1;
+  }
+  .phone-header .status {
+    font-size: 11px;
+    color: var(--cream-dim);
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .phone-header .status .dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--cream-faint);
+  }
+  .phone-header .status.live .dot { background: var(--green); }
+
+  .role-badge {
+    font-size: 9px;
+    padding: 4px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+  }
+  .role-badge.bartender { background: var(--gold-soft); color: var(--bg-deep); }
+  .role-badge.viewer { background: rgba(184, 150, 86, 0.08); color: var(--cream-dim); border: 1px solid var(--border); }
+
+  .session-controls { margin-top: 14px; }
+
+  .icon-btn {
+    color: var(--cream-dim);
+    padding: 8px;
+    line-height: 0;
+    border-radius: 4px;
+    transition: color 0.15s;
+  }
+  .icon-btn:hover { color: var(--cream); }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-bottom: 1px solid var(--border);
+  }
+  .tab-btn {
+    padding: 14px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--cream-dim);
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .tab-btn:hover { color: var(--cream-soft); }
+  .tab-btn.active {
+    color: var(--gold-bright);
+    border-bottom-color: var(--gold-bright);
+  }
+  .tab-btn svg { width: 18px; height: 18px; }
+  .tab-btn .lbl {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+
+  .tab-content { flex: 1; overflow-y: auto; padding: 18px; padding-bottom: 40px; }
+
+  .step-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--cream-dim);
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  /* Patron grid for pour selection */
+  .patron-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .patron-card {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+  }
+  .patron-card:hover:not(:disabled) { background: var(--bg-elevated); border-color: var(--gold-soft); }
+  .patron-card:active:not(:disabled) { transform: scale(0.98); }
+  .patron-card .nm {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--cream);
+  }
+  .patron-card .ct {
+    font-size: 12px;
+    color: var(--gold-bright);
+    font-weight: 500;
+  }
+
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--cream-dim);
+    font-size: 13px;
+    padding: 0 0 12px;
+    transition: color 0.15s;
+  }
+  .back-btn:hover { color: var(--cream); }
+
+  .friend-detail {
+    margin-bottom: 20px;
+    padding: 24px 16px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .friend-detail .nm {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--cream);
+  }
+
+  /* Keg pour button (phone) */
+  .keg-pour {
+    width: 100%;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-align: left;
+    transition: all 0.15s;
+    margin-bottom: 8px;
+  }
+  .keg-pour:hover:not(:disabled) { background: var(--bg-elevated); border-color: var(--gold-soft); }
+  .keg-pour:active:not(:disabled) { transform: scale(0.99); }
+  .keg-pour .tap-circle {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--gold-soft);
+    color: var(--bg-deep);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+  .keg-pour:disabled .tap-circle { background: var(--bg-hover); color: var(--cream-faint); }
+  .keg-pour .info { flex: 1; min-width: 0; }
+  .keg-pour .nm {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--cream);
+    line-height: 1.1;
+  }
+  .keg-pour .meta {
+    font-size: 12px;
+    color: var(--cream-dim);
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    margin-top: 2px;
+  }
+  .keg-pour .track {
+    margin-top: 8px;
+    height: 3px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 2px;
+  }
+  .keg-pour .fill { height: 100%; background: var(--gold-soft); border-radius: 2px; }
+  .keg-pour .right { text-align: right; flex-shrink: 0; }
+  .keg-pour .pct {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    color: var(--gold-bright);
+    font-weight: 600;
+  }
+  .keg-pour .empty-lbl {
+    font-size: 9px;
+    color: var(--red);
+    letter-spacing: 0.12em;
+    margin-top: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Friend rows */
+  .friend-row {
+    padding: 12px 14px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+  .friend-row .info { flex: 1; min-width: 0; }
+  .friend-row .nm {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--cream);
+    line-height: 1.1;
+  }
+  .friend-row .meta {
+    font-size: 12px;
+    color: var(--cream-dim);
+    margin-top: 2px;
+  }
+
+  /* Form pages */
+  .form-page h2 {
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 18px;
+    color: var(--cream);
+  }
+  .mono-picker {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .mono-picker .preview-wrap { display: flex; align-items: center; gap: 12px; }
+  .mono-picker .preview-note { font-size: 12px; color: var(--cream-dim); font-style: italic; font-family: 'Cormorant Garamond', serif; }
+
+  .form-actions {
+    display: grid;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .form-actions.two { grid-template-columns: 1fr 1fr; }
+  .form-actions.three { grid-template-columns: 1fr 1fr 1fr; }
+
+  /* Keg edit card */
+  .keg-edit {
+    padding: 16px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  .keg-edit .head { display: flex; gap: 12px; align-items: flex-start; }
+  .keg-edit .head .info { flex: 1; min-width: 0; }
+  .keg-edit .head .nm {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--cream);
+    line-height: 1.1;
+  }
+  .keg-edit .head .meta {
+    font-size: 12px;
+    color: var(--cream-dim);
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    margin-top: 2px;
+  }
+  .keg-edit .level-track {
+    margin-top: 12px;
+    height: 5px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 2px;
+  }
+  .keg-edit .level-fill {
+    height: 100%;
+    background: var(--gold-soft);
+    border-radius: 2px;
+    transition: width 0.4s;
+  }
+  .keg-edit .stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--cream-dim);
+  }
+  .keg-edit .stats .pct { color: var(--gold-bright); font-weight: 600; }
+
+  /* History */
+  .history-row {
+    padding: 14px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  .history-row .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .history-row .date {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gold-bright);
+  }
+  .history-row .live-tag {
+    font-size: 10px;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+  }
+  .history-row .stats-line {
+    font-size: 12px;
+    color: var(--cream-dim);
+    margin-top: 4px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+  .history-row .chips {
+    margin-top: 10px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .friend-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--cream);
+    padding: 4px 8px 4px 4px;
+    background: rgba(184, 150, 86, 0.08);
+    border-radius: 999px;
+    border: 1px solid var(--border);
+  }
+  .friend-chip .num { color: var(--gold-bright); font-weight: 600; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    font-size: 14px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    animation: slideUp 0.3s;
+    z-index: 999;
+    max-width: calc(100% - 32px);
+    text-align: center;
+  }
+  .toast.success, .toast.pour { color: var(--gold-bright); border-color: var(--gold); }
+  .toast.kill { color: var(--red); border-color: var(--red); }
+  .toast.warn { color: var(--amber); border-color: var(--amber); }
+  .toast.info { color: var(--cream); }
+
+  /* Loading */
+  .loading {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; min-height: 100dvh;
+  }
+  .loading-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--gold);
+    animation: softPulse 1.8s infinite;
+  }
+
+  /* Config warning */
+  .config-warning {
+    margin-top: 32px;
+    padding: 20px;
+    background: rgba(138, 58, 58, 0.08);
+    border: 1px solid var(--red);
+    border-radius: 8px;
+    text-align: left;
+  }
+  .config-warning h3 {
+    font-size: 18px;
+    color: var(--red);
+    margin-bottom: 8px;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .config-warning p { font-size: 14px; line-height: 1.6; color: var(--cream); margin-bottom: 8px; }
+  .config-warning code {
+    background: rgba(0,0,0,0.3);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: ui-monospace, monospace;
+    font-size: 12px;
+    color: var(--gold-bright);
+  }
+
+  .link {
+    color: var(--gold);
+    text-decoration: underline;
+    text-decoration-color: var(--brass);
+    text-underline-offset: 3px;
+    font-size: 13px;
+  }
+  .link:hover { color: var(--gold-bright); }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="app-bg grain loading">
+    <div class="loading-text">Pouring…</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SVG ICON DEFINITIONS — refined line icons used throughout
+     ============================================================ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-tv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/>
+    </symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/>
+    </symbol>
+    <symbol id="i-beer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M7 9V19a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9"/><path d="M17 7H7v2h10z"/><path d="M17 12h2a2 2 0 0 1 0 4h-2"/>
+    </symbol>
+    <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+    </symbol>
+    <symbol id="i-droplet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2.5s5.5 5.5 5.5 10a5.5 5.5 0 0 1-11 0c0-4.5 5.5-10 5.5-10z"/>
+    </symbol>
+    <symbol id="i-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/>
+    </symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 6 6 18M6 6l12 12"/>
+    </symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+    </symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+    </symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 5v14M5 12h14"/>
+    </symbol>
+    <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </symbol>
+    <symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="6 4 20 12 6 20 6 4"/>
+    </symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="6" y="6" width="12" height="12" rx="1"/>
+    </symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-4"/>
+    </symbol>
+  </defs>
+</svg>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import {
+    getAuth, signInAnonymously, onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import {
+    getFirestore, doc, setDoc, getDoc, onSnapshot, updateDoc
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ========================================================
+  // FIREBASE CONFIG — REPLACE WITH YOUR OWN VALUES
+  // (See README.md for step-by-step instructions)
+  // ========================================================
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
+  authDomain: "pool-bar-57de0.firebaseapp.com",
+  projectId: "pool-bar-57de0",
+  storageBucket: "pool-bar-57de0.firebasestorage.app",
+  messagingSenderId: "91450372438",
+  appId: "1:91450372438:web:1f3599fe22e734b0e2e6f7"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+  // ========================================================
+  // CONSTANTS
+  // ========================================================
+  const KEG_SIZES = {
+    sixth:    { name: "1/6 Barrel (Sixtel)", oz: 661 },
+    quarter:  { name: "1/4 Barrel (Pony)",   oz: 992 },
+    half:     { name: "1/2 Barrel (Full)",   oz: 1984 },
+    cornelius:{ name: "Cornelius (Corny)",   oz: 640 }
+  };
+  const POUR_OZ = 12;
+  const ROTATE_MS = 12000;
+
+  const DEFAULT_FRIENDS = [
+    { id: "f1", name: "Marcus Walker" },
+    { id: "f2", name: "Jessica Owens" },
+    { id: "f3", name: "Tyler Brennan" },
+    { id: "f4", name: "Sam Doyle" }
+  ];
+  const DEFAULT_KEGS = [
+    { id: "k1", tap: 1, name: "Guinness Draught", brewery: "St. James's Gate", style: "Stout",     size: "half",  remainingOz: 1984, costCents: 22000 },
+    { id: "k2", tap: 2, name: "Smithwick's",      brewery: "Smithwick's",      style: "Red Ale",   size: "half",  remainingOz: 1984, costCents: 18000 },
+    { id: "k3", tap: 3, name: "Harp Lager",       brewery: "Harp",             style: "Lager",     size: "sixth", remainingOz: 661,  costCents: 14000 },
+    { id: "k4", tap: 4, name: "Kilkenny",         brewery: "Kilkenny",         style: "Cream Ale", size: "sixth", remainingOz: 661,  costCents: 14000 }
+  ];
+  const ACHIEVEMENTS = [
+    { id: "first_pour",   name: "First Pour",   desc: "Welcome to the snug",   icon: "🍺" },
+    { id: "half_century", name: "Half Century", desc: "50 lifetime pints",     icon: "🎯" },
+    { id: "century",      name: "Century Club", desc: "100 lifetime pints",    icon: "💯" },
+    { id: "regular",      name: "The Regular",  desc: "5 sessions attended",   icon: "🎖️" },
+    { id: "iron_liver",   name: "Iron Liver",   desc: "10 in one night",       icon: "⚔️" },
+    { id: "keg_killer",   name: "Keg Slayer",   desc: "Drained the last drop", icon: "💀" },
+    { id: "explorer",     name: "Tap Explorer", desc: "Tried every tap",       icon: "🗺️" },
+    { id: "early_bird",   name: "Early Bird",   desc: "First pour of the night", icon: "🌅" }
+  ];
+
+  // ========================================================
+  // STATE
+  // ========================================================
+  const State = {
+    db: null,
+    auth: null,
+    user: null,
+    barCode: null,
+    role: null,
+    isBartender: false,
+    barData: null,
+    unsubscribe: null,
+    viewIdx: 0,
+    rotateInterval: null,
+    selectedFriend: null,
+    activeTab: "pour",
+    editingFriendId: null,
+    addingFriend: false,
+    editingKegId: null
+  };
+
+  // ========================================================
+  // HELPERS
+  // ========================================================
+  const $ = (q) => document.querySelector(q);
+  const uid = () => Math.random().toString(36).slice(2, 10);
+  const fmtMoney = (c) => `$${(c / 100).toFixed(2)}`;
+  const fmtTime = (ts) => new Date(ts).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  const fmtDate = (ts) => new Date(ts).toLocaleDateString([], { month: "short", day: "numeric" });
+  const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const icon = (id) => `<svg><use href="#i-${id}"/></svg>`;
+
+  // Get monogram initials from name: "Marcus Walker" -> "MW", "Sam" -> "S", "Mary Jane Smith" -> "MS"
+  function initials(name) {
+    if (!name) return "?";
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0][0].toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  function monogram(name, size = "md", isGold = false) {
+    return `<div class="mono ${size}${isGold ? " gold" : ""}">${initials(name)}</div>`;
+  }
+
+  function generateBarCode() {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let s = "";
+    for (let i = 0; i < 6; i++) s += chars[Math.floor(Math.random() * chars.length)];
+    return `TAPHOUSE-${s.slice(0,3)}${s.slice(3)}`;
+  }
+  function normalizeBarCode(input) {
+    let s = (input || "").trim().toUpperCase();
+    if (!s) return "";
+    if (!s.startsWith("TAPHOUSE-")) s = "TAPHOUSE-" + s;
+    return s;
+  }
+
+  function showToast(msg, kind = "info") {
+    const existing = document.querySelector(".toast");
+    if (existing) existing.remove();
+    const t = document.createElement("div");
+    t.className = "toast " + kind;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+  }
+
+  // ========================================================
+  // FIREBASE INIT
+  // ========================================================
+  async function initFirebase() {
+    if (!isConfigured) return false;
+    try {
+      const app = initializeApp(firebaseConfig);
+      State.auth = getAuth(app);
+      State.db = getFirestore(app);
+      await new Promise((resolve, reject) => {
+        const unsub = onAuthStateChanged(State.auth, (user) => {
+          if (user) { State.user = user; unsub(); resolve(); }
+        }, reject);
+        signInAnonymously(State.auth).catch(reject);
+      });
+      return true;
+    } catch (e) {
+      console.error("Firebase init failed:", e);
+      return false;
+    }
+  }
+
+  async function createBar() {
+    const code = generateBarCode();
+    const initial = {
+      friends: DEFAULT_FRIENDS,
+      kegs: DEFAULT_KEGS,
+      sessions: [],
+      currentSessionId: null,
+      bartenderUid: State.user.uid,
+      createdAt: Date.now()
+    };
+    await setDoc(doc(State.db, "bars", code), initial);
+    localStorage.setItem("taphouse_barCode", code);
+    State.barCode = code;
+    return code;
+  }
+  async function joinBar(code) {
+    const snap = await getDoc(doc(State.db, "bars", code));
+    if (!snap.exists()) throw new Error("Bar not found. Check the code.");
+    localStorage.setItem("taphouse_barCode", code);
+    State.barCode = code;
+    return snap.data();
+  }
+  function subscribeBar() {
+    if (State.unsubscribe) State.unsubscribe();
+    State.unsubscribe = onSnapshot(doc(State.db, "bars", State.barCode), (snap) => {
+      if (!snap.exists()) { showToast("Bar no longer exists", "warn"); return; }
+      const data = snap.data();
+      const prev = State.barData;
+      State.barData = data;
+      State.isBartender = data.bartenderUid === State.user.uid;
+      if (State.role === "tv" && prev) {
+        const oldSession = prev.sessions.find(s => s.id === prev.currentSessionId);
+        const newSession = data.sessions.find(s => s.id === data.currentSessionId);
+        const oldLastPour = oldSession?.pours?.[oldSession.pours.length - 1];
+        const newLastPour = newSession?.pours?.[newSession.pours.length - 1];
+        if (newLastPour && newLastPour.id !== oldLastPour?.id) showNowPouring(newLastPour);
+      }
+      render();
+    }, (err) => {
+      console.error("Subscribe error:", err);
+      showToast("Connection lost", "warn");
+    });
+  }
+  async function updateBar(updater) {
+    const docRef = doc(State.db, "bars", State.barCode);
+    const next = updater(structuredClone(State.barData));
+    await updateDoc(docRef, next);
+  }
+
+  // ========================================================
+  // ACHIEVEMENT LOGIC
+  // ========================================================
+  function computeFriendStats(friendId) {
+    if (!State.barData) return { lifetime: 0, sessionsAttended: 0, maxInSession: 0, kegKills: 0, tapsUsed: {}, firstPourEver: null };
+    let lifetime = 0, sessionsAttended = 0, maxInSession = 0, kegKills = 0;
+    const tapsUsed = {};
+    let firstPourEver = null;
+    State.barData.sessions.forEach(sess => {
+      const inSess = sess.pours.filter(p => p.friendId === friendId);
+      lifetime += inSess.length;
+      if (inSess.length > 0) sessionsAttended++;
+      if (inSess.length > maxInSession) maxInSession = inSess.length;
+      inSess.forEach(p => {
+        if (p.kegKill) kegKills++;
+        tapsUsed[p.kegId] = true;
+        if (p.firstOfNight) firstPourEver = p.ts;
+      });
+    });
+    return { lifetime, sessionsAttended, maxInSession, kegKills, tapsUsed, firstPourEver };
+  }
+  function getEarnedAchievements(friendId) {
+    const s = computeFriendStats(friendId);
+    const earned = [];
+    if (s.lifetime >= 1) earned.push("first_pour");
+    if (s.lifetime >= 50) earned.push("half_century");
+    if (s.lifetime >= 100) earned.push("century");
+    if (s.sessionsAttended >= 5) earned.push("regular");
+    if (s.maxInSession >= 10) earned.push("iron_liver");
+    if (s.kegKills >= 1) earned.push("keg_killer");
+    if (Object.keys(s.tapsUsed).length >= Math.min(4, State.barData?.kegs?.length || 4)) earned.push("explorer");
+    if (s.firstPourEver) earned.push("early_bird");
+    return earned;
+  }
+
+  // ========================================================
+  // ACTIONS (bartender only)
+  // ========================================================
+  async function startSession() {
+    if (!State.isBartender) return;
+    await updateBar(d => {
+      const id = uid();
+      d.currentSessionId = id;
+      d.sessions.push({ id, startedAt: Date.now(), endedAt: null, pours: [] });
+      return { sessions: d.sessions, currentSessionId: id };
+    });
+    showToast("Session started. Sláinte.", "success");
+  }
+  async function endSession() {
+    if (!State.isBartender) return;
+    await updateBar(d => {
+      d.sessions = d.sessions.map(s => s.id === d.currentSessionId ? { ...s, endedAt: Date.now() } : s);
+      d.currentSessionId = null;
+      return { sessions: d.sessions, currentSessionId: null };
+    });
+    showToast("Session closed. Stats saved.", "info");
+  }
+  async function logPour(friendId, kegId) {
+    if (!State.isBartender) { showToast("Only the bartender can pour", "warn"); return; }
+    if (!State.barData.currentSessionId) { showToast("Start a session first", "warn"); return; }
+    const keg = State.barData.kegs.find(k => k.id === kegId);
+    if (!keg || keg.remainingOz < POUR_OZ) { showToast("That keg is dry", "warn"); return; }
+    const friend = State.barData.friends.find(f => f.id === friendId);
+    const newRemaining = keg.remainingOz - POUR_OZ;
+    const isKegKill = newRemaining < POUR_OZ && keg.remainingOz >= POUR_OZ;
+    const session = State.barData.sessions.find(s => s.id === State.barData.currentSessionId);
+    const isFirstOfNight = session && session.pours.length === 0;
+    await updateBar(d => {
+      d.kegs = d.kegs.map(k => k.id === kegId ? { ...k, remainingOz: newRemaining } : k);
+      d.sessions = d.sessions.map(s => s.id === d.currentSessionId
+        ? { ...s, pours: [...s.pours, { id: uid(), friendId, kegId, ts: Date.now(), kegKill: isKegKill, firstOfNight: isFirstOfNight }] }
+        : s);
+      return { kegs: d.kegs, sessions: d.sessions };
+    });
+    if (isKegKill) showToast(`${friend.name} drained the ${keg.name}`, "kill");
+    else showToast(`Poured for ${friend.name}`, "pour");
+  }
+  async function undoLastPour() {
+    if (!State.isBartender) return;
+    const session = State.barData.sessions.find(s => s.id === State.barData.currentSessionId);
+    if (!session || session.pours.length === 0) return;
+    const last = session.pours[session.pours.length - 1];
+    await updateBar(d => {
+      d.kegs = d.kegs.map(k => k.id === last.kegId ? { ...k, remainingOz: k.remainingOz + POUR_OZ } : k);
+      d.sessions = d.sessions.map(s => s.id === d.currentSessionId ? { ...s, pours: s.pours.slice(0, -1) } : s);
+      return { kegs: d.kegs, sessions: d.sessions };
+    });
+    showToast("Last pour undone", "info");
+  }
+  async function addFriend(name) {
+    if (!State.isBartender) return;
+    await updateBar(d => { d.friends = [...d.friends, { id: uid(), name }]; return { friends: d.friends }; });
+  }
+  async function updateFriend(id, updates) {
+    if (!State.isBartender) return;
+    await updateBar(d => { d.friends = d.friends.map(f => f.id === id ? { ...f, ...updates } : f); return { friends: d.friends }; });
+  }
+  async function deleteFriend(id) {
+    if (!State.isBartender) return;
+    await updateBar(d => { d.friends = d.friends.filter(f => f.id !== id); return { friends: d.friends }; });
+  }
+  async function updateKeg(id, updates) {
+    if (!State.isBartender) return;
+    await updateBar(d => { d.kegs = d.kegs.map(k => k.id === id ? { ...k, ...updates } : k); return { kegs: d.kegs }; });
+  }
+  async function swapKeg(id, newData) {
+    if (!State.isBartender) return;
+    const size = newData.size || "half";
+    const oz = KEG_SIZES[size].oz;
+    await updateBar(d => { d.kegs = d.kegs.map(k => k.id === id ? { ...k, ...newData, remainingOz: oz, size } : k); return { kegs: d.kegs }; });
+    showToast(`Tap swapped to ${newData.name}`, "success");
+  }
+
+  // ========================================================
+  // RENDER
+  // ========================================================
+  function render() {
+    const app = $("#app");
+    if (!isConfigured) { app.innerHTML = renderConfigWarning(); return; }
+    if (!State.user) {
+      app.innerHTML = `<div class="app-bg grain loading"><div class="loading-text">Connecting…</div></div>`;
+      return;
+    }
+    if (!State.role) {
+      if (State.barCode && State.barData) {
+        app.innerHTML = renderRoleSelector();
+        attachRoleSelectorHandlers();
+      } else {
+        app.innerHTML = renderSplash();
+        attachSplashHandlers();
+      }
+      return;
+    }
+    if (!State.barData) {
+      app.innerHTML = `<div class="app-bg grain loading"><div class="loading-text">Loading bar…</div></div>`;
+      return;
+    }
+    if (State.role === "tv") {
+      app.innerHTML = renderTV();
+      attachTVHandlers();
+    } else {
+      app.innerHTML = renderPhone();
+      attachPhoneHandlers();
+    }
+  }
+
+  function renderConfigWarning() {
+    return `
+      <div class="app-bg grain splash">
+        <div class="splash-inner">
+          <div class="brand">
+            <div class="eyebrow">Established</div>
+            <h1 class="serif">The Tap House</h1>
+            <div class="tagline">Sláinte mhaith</div>
+          </div>
+          <div class="config-warning">
+            <h3>Setup needed</h3>
+            <p>This app needs a Firebase config to run. Open <code>index.html</code> and paste your Firebase config values into the <code>firebaseConfig</code> object near the top of the script.</p>
+            <p>See <code>README.md</code> for step-by-step instructions.</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderSplash() {
+    const savedCode = localStorage.getItem("taphouse_barCode") || "";
+    return `
+      <div class="app-bg grain splash">
+        <div class="splash-inner">
+          <div class="brand">
+            <div class="eyebrow">Established</div>
+            <h1 class="serif">The Tap House</h1>
+            <div class="tagline">Sláinte mhaith</div>
+          </div>
+
+          <div class="card">
+            <h2 class="serif">Welcome</h2>
+            <p class="sub">First time? Open a new bar. Got a code? Join an existing one.</p>
+
+            <button class="btn btn-primary" id="btn-create-bar" style="width: 100%;">Open a new bar</button>
+
+            <div class="divider">or join with a code</div>
+
+            <div class="field">
+              <div class="row">
+                <input type="text" id="join-code-input" placeholder="TAPHOUSE-XXXXXX" value="${escapeHtml(savedCode)}" autocapitalize="characters" autocomplete="off" />
+                <button class="btn btn-ghost" id="btn-join-bar">Join</button>
+              </div>
+            </div>
+
+            <div class="info-note">
+              Whoever opens the bar becomes the bartender — only they can log pours. Anyone with the code can view the leaderboard from any device.
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function attachSplashHandlers() {
+    $("#btn-create-bar")?.addEventListener("click", async () => {
+      try {
+        await createBar();
+        subscribeBar();
+        showToast("New bar opened. You're the bartender.", "success");
+      } catch (e) {
+        console.error(e);
+        showToast("Couldn't create bar: " + e.message, "warn");
+      }
+    });
+    $("#btn-join-bar")?.addEventListener("click", async () => {
+      const code = normalizeBarCode($("#join-code-input").value);
+      if (!code || code === "TAPHOUSE-") { showToast("Enter a bar code", "warn"); return; }
+      try { await joinBar(code); subscribeBar(); showToast("Joined.", "success"); }
+      catch (e) { showToast(e.message, "warn"); }
+    });
+    $("#join-code-input")?.addEventListener("keydown", e => {
+      if (e.key === "Enter") $("#btn-join-bar").click();
+    });
+  }
+
+  function renderRoleSelector() {
+    return `
+      <div class="app-bg grain splash">
+        <div class="splash-inner">
+          <div class="brand">
+            <div class="eyebrow">Established</div>
+            <h1 class="serif">The Tap House</h1>
+            <div class="tagline">Sláinte mhaith</div>
+          </div>
+
+          <div class="bar-code-display">
+            <div class="label">Bar code</div>
+            <div class="code">${escapeHtml(State.barCode)}</div>
+            <div class="role">${State.isBartender ? "You are the bartender" : "You are a viewer"}</div>
+          </div>
+
+          <div class="mode-grid">
+            <button class="mode-card" data-role="tv">
+              <div class="icon-wrap">${icon("tv")}</div>
+              <div class="label">The Big Screen</div>
+              <div class="sub">Display for the bar</div>
+            </button>
+            <button class="mode-card" data-role="phone">
+              <div class="icon-wrap">${icon("phone")}</div>
+              <div class="label">${State.isBartender ? "Barkeep's Book" : "Spectator"}</div>
+              <div class="sub">${State.isBartender ? "Control from your phone" : "View live stats"}</div>
+            </button>
+          </div>
+
+          <div class="help-text">
+            Open this on the TV (cast or HDMI) and pick "The Big Screen". On your phone, choose your role.<br>
+            <button class="link" id="btn-leave-bar" style="margin-top: 14px;">Leave this bar</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function attachRoleSelectorHandlers() {
+    document.querySelectorAll("[data-role]").forEach(el => {
+      el.addEventListener("click", () => {
+        State.role = el.dataset.role;
+        if (State.role === "tv") startTVRotation();
+        render();
+      });
+    });
+    $("#btn-leave-bar")?.addEventListener("click", () => {
+      if (State.unsubscribe) State.unsubscribe();
+      localStorage.removeItem("taphouse_barCode");
+      State.barCode = null; State.barData = null; State.role = null;
+      render();
+    });
+  }
+
+  // ====== TV ======
+  function startTVRotation() {
+    if (State.rotateInterval) clearInterval(State.rotateInterval);
+    State.rotateInterval = setInterval(() => {
+      State.viewIdx = (State.viewIdx + 1) % 4;
+      render();
+    }, ROTATE_MS);
+  }
+
+  function renderTV() {
+    const views = ["leaderboard", "kegs", "achievements", "stats"];
+    const session = State.barData.sessions.find(s => s.id === State.barData.currentSessionId);
+    let content = "";
+    if (views[State.viewIdx] === "leaderboard") content = renderTVLeaderboard(session);
+    else if (views[State.viewIdx] === "kegs") content = renderTVKegs();
+    else if (views[State.viewIdx] === "achievements") content = renderTVAchievements();
+    else if (views[State.viewIdx] === "stats") content = renderTVStats(session);
+
+    return `
+      <div class="app-bg grain tv-shell">
+        <div class="tv-header">
+          <div class="tv-brand">
+            <h1 class="serif">The Tap House</h1>
+            <div class="tv-status ${session ? "live" : ""}"><span class="dot"></span>${session ? "Session in progress" : "Tavern at rest"}</div>
+          </div>
+          <div class="pagination">
+            ${views.map((_, i) => `<div class="page-dot${i === State.viewIdx ? " active" : ""}"></div>`).join("")}
+          </div>
+          <button class="icon-btn" id="btn-tv-exit">${icon("x")}</button>
+        </div>
+        <div class="tv-content">${content}</div>
+      </div>
+    `;
+  }
+  function attachTVHandlers() {
+    $("#btn-tv-exit")?.addEventListener("click", () => {
+      if (State.rotateInterval) clearInterval(State.rotateInterval);
+      State.role = null;
+      render();
+    });
+  }
+
+  function tvHeading(eyebrow, title, sub) {
+    return `
+      <div class="tv-heading">
+        <div class="eyebrow">${escapeHtml(eyebrow)}</div>
+        <h2 class="serif">${escapeHtml(title)}</h2>
+        ${sub ? `<div class="sub">${escapeHtml(sub)}</div>` : ""}
+      </div>
+    `;
+  }
+
+  function renderTVLeaderboard(session) {
+    const tonightCounts = {};
+    (session?.pours || []).forEach(p => { tonightCounts[p.friendId] = (tonightCounts[p.friendId] || 0) + 1; });
+    const lifetimeCounts = {};
+    State.barData.sessions.forEach(s => s.pours.forEach(p => { lifetimeCounts[p.friendId] = (lifetimeCounts[p.friendId] || 0) + 1; }));
+    const ranked = State.barData.friends
+      .map(f => ({ ...f, tonight: tonightCounts[f.id] || 0, lifetime: lifetimeCounts[f.id] || 0 }))
+      .sort((a, b) => b.tonight - a.tonight || b.lifetime - a.lifetime);
+    const maxTonight = Math.max(...ranked.map(r => r.tonight), 1);
+
+    return `
+      <div style="animation: slideUp 0.5s;">
+        ${tvHeading("Tonight", "At the bar", "Ranking of the regulars")}
+        <div class="leaderboard">
+          ${ranked.map((f, i) => {
+            const widthPct = (f.tonight / maxTonight) * 100;
+            const isLeader = i === 0 && f.tonight > 0;
+            return `
+              <div class="lb-row${isLeader ? " leader" : ""}" style="animation: slideUp 0.4s ${i * 0.06}s both;">
+                <div class="lb-rank num">${i + 1}</div>
+                ${monogram(f.name, "lg", isLeader)}
+                <div>
+                  <div class="lb-name">${escapeHtml(f.name)}</div>
+                  <div class="lb-bar-track"><div class="lb-bar-fill" style="width: ${widthPct}%; animation-delay: ${i * 0.08}s;"></div></div>
+                </div>
+                <div class="lb-num-block">
+                  <div class="value num">${f.tonight}</div>
+                  <div class="label">Tonight</div>
+                </div>
+                <div class="lb-lifetime">
+                  <div class="value num">${f.lifetime}</div>
+                  <div class="label">Lifetime</div>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderTVKegs() {
+    return `
+      <div style="animation: slideUp 0.5s;">
+        ${tvHeading("On Tap", "What's flowing", "Tonight's selection")}
+        <div class="keg-grid">
+          ${[...State.barData.kegs].sort((a,b) => a.tap - b.tap).map((keg, i) => {
+            const fullOz = KEG_SIZES[keg.size].oz;
+            const pct = Math.max(0, (keg.remainingOz / fullOz) * 100);
+            const isLow = pct < 15 && keg.remainingOz >= POUR_OZ;
+            const isEmpty = keg.remainingOz < POUR_OZ;
+            return `
+              <div class="keg-card${isEmpty ? " empty" : isLow ? " low" : ""}" style="animation: slideUp 0.5s ${i * 0.08}s both;">
+                <div class="keg-head">
+                  <div class="tap-num">Tap ${keg.tap}</div>
+                  ${isEmpty ? '<div class="keg-pill empty">Empty</div>' : isLow ? '<div class="keg-pill low">Running low</div>' : ''}
+                </div>
+                <div class="keg-name serif">${escapeHtml(keg.name)}</div>
+                <div class="keg-meta">${escapeHtml(keg.brewery)} · ${escapeHtml(keg.style)}</div>
+                <div class="keg-visual"><div class="fill" style="height: ${pct}%;"></div></div>
+                <div class="keg-stats">
+                  <span class="num">${Math.round(keg.remainingOz)} oz remaining</span>
+                  <span class="pct num">${Math.round(pct)}%</span>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderTVAchievements() {
+    const allEarned = [];
+    State.barData.friends.forEach(f => {
+      getEarnedAchievements(f.id).forEach(achId => {
+        const ach = ACHIEVEMENTS.find(a => a.id === achId);
+        if (ach) allEarned.push({ friend: f, ach });
+      });
+    });
+    return `
+      <div style="animation: slideUp 0.5s;">
+        ${tvHeading("Hall of Fame", "Honours bestowed", "Earned through the long evenings")}
+        ${allEarned.length === 0
+          ? `<div class="empty-state">No honours yet — the night is young.</div>`
+          : `<div class="ach-grid">
+              ${allEarned.slice(0, 9).map((item, i) => `
+                <div class="ach-card" style="animation: slideUp 0.4s ${i * 0.05}s both;">
+                  <div class="ach-icon">${item.ach.icon}</div>
+                  <div class="ach-info">
+                    <div class="ach-name">${escapeHtml(item.ach.name)}</div>
+                    <div class="ach-desc">${escapeHtml(item.ach.desc)}</div>
+                    <div class="ach-who">${monogram(item.friend.name, "sm")}${escapeHtml(item.friend.name)}</div>
+                  </div>
+                </div>
+              `).join("")}
+            </div>`
+        }
+      </div>
+    `;
+  }
+
+  function renderTVStats(session) {
+    const totalTonight = (session?.pours || []).length;
+    const totalLifetime = State.barData.sessions.reduce((sum, s) => sum + s.pours.length, 0);
+    const totalSessions = State.barData.sessions.length;
+    const oncePer = totalSessions > 0 ? (totalLifetime / totalSessions).toFixed(1) : "0";
+    const tapCounts = {};
+    State.barData.sessions.forEach(s => s.pours.forEach(p => { tapCounts[p.kegId] = (tapCounts[p.kegId] || 0) + 1; }));
+    const popularKegs = State.barData.kegs.map(k => ({ ...k, count: tapCounts[k.id] || 0 })).sort((a,b) => b.count - a.count);
+    const totalSpent = State.barData.kegs.reduce((sum, k) => sum + k.costCents, 0);
+    const totalCapacityOz = State.barData.kegs.reduce((sum, k) => sum + KEG_SIZES[k.size].oz, 0);
+    const totalPouredOz = State.barData.kegs.reduce((sum, k) => sum + (KEG_SIZES[k.size].oz - k.remainingOz), 0);
+    const costPerOz = totalCapacityOz > 0 ? totalSpent / totalCapacityOz : 0;
+    const costSoFar = totalPouredOz * costPerOz;
+
+    return `
+      <div style="animation: slideUp 0.5s;">
+        ${tvHeading("The Ledger", "Numbers from the till", "An accounting")}
+        <div class="stat-grid">
+          ${bigStat("Tonight", totalTonight, "pints poured")}
+          ${bigStat("All-time", totalLifetime, "pints poured")}
+          ${bigStat("Sessions", totalSessions, "parties hosted")}
+          ${bigStat("Average", oncePer, "pints per session")}
+        </div>
+        <div class="stat-pair">
+          <div class="panel">
+            <h3>Most popular tap</h3>
+            ${popularKegs.slice(0, 4).map(k => {
+              const max = popularKegs[0].count || 1;
+              return `
+                <div class="pop-row">
+                  <div class="head"><span class="nm">Tap ${k.tap} · ${escapeHtml(k.name)}</span><span class="ct num">${k.count}</span></div>
+                  <div class="track"><div class="fill" style="width: ${(k.count / max) * 100}%;"></div></div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+          <div class="panel">
+            <h3>The bill</h3>
+            <div class="ledger">
+              <div class="ledger-row"><span class="l">Invested in kegs</span><span class="v num">${fmtMoney(totalSpent)}</span></div>
+              <div class="ledger-row"><span class="l">Poured so far</span><span class="v num">${fmtMoney(costSoFar)}</span></div>
+              <div class="ledger-row"><span class="l">Still in the kegs</span><span class="v num">${fmtMoney(totalSpent - costSoFar)}</span></div>
+              <div class="ledger-row total"><span class="l">Cost per pint</span><span class="v num">${fmtMoney(Math.round(costPerOz * POUR_OZ * 100))}</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  function bigStat(label, value, sub) {
+    return `<div class="stat-block">
+      <div class="label">${escapeHtml(label)}</div>
+      <div class="value num">${value}</div>
+      <div class="sub">${escapeHtml(sub)}</div>
+    </div>`;
+  }
+
+  function showNowPouring(pour) {
+    const friend = State.barData.friends.find(f => f.id === pour.friendId);
+    const keg = State.barData.kegs.find(k => k.id === pour.kegId);
+    if (!friend || !keg) return;
+    const existing = document.querySelector(".pouring-overlay");
+    if (existing) existing.remove();
+    const overlay = document.createElement("div");
+    overlay.className = "pouring-overlay";
+    overlay.innerHTML = `
+      <div class="pouring-card${pour.kegKill ? ' kill' : ''}">
+        ${pour.kegKill ? '<div class="slayer-tag">Keg Slayer</div>' : ''}
+        <div class="mono-wrap">${monogram(friend.name, "xxl", true)}</div>
+        <div class="eyebrow">Now Pouring</div>
+        <div class="name">${escapeHtml(friend.name)}</div>
+        <div class="pour-line">a pint of ${escapeHtml(keg.name)}</div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    setTimeout(() => overlay.remove(), 4500);
+  }
+
+  // ====== PHONE ======
+  function renderPhone() {
+    const session = State.barData.sessions.find(s => s.id === State.barData.currentSessionId);
+    let body = "";
+    if (State.activeTab === "pour") body = renderPourTab(session);
+    else if (State.activeTab === "friends") body = renderFriendsTab();
+    else if (State.activeTab === "kegs") body = renderKegsTab();
+    else if (State.activeTab === "history") body = renderHistoryTab();
+
+    return `
+      <div class="app-bg grain phone-wrap">
+        <div class="phone-header">
+          <div class="top">
+            <div style="min-width: 0;">
+              <h1>${State.isBartender ? "Barkeep's Book" : "The Snug"}</h1>
+              <div class="status ${session ? "live" : ""}"><span class="dot"></span>${session ? "Active session" : "No session"}</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="role-badge ${State.isBartender ? "bartender" : "viewer"}">${State.isBartender ? "Bartender" : "Viewer"}</span>
+              <button class="icon-btn" id="btn-phone-exit">${icon("x")}</button>
+            </div>
+          </div>
+          <div class="session-controls">${renderSessionControls(session)}</div>
+        </div>
+        <div class="tabs">
+          ${renderTab("pour", "Pour", "beer")}
+          ${renderTab("friends", "Patrons", "users")}
+          ${renderTab("kegs", "Kegs", "droplet")}
+          ${renderTab("history", "Log", "history")}
+        </div>
+        <div class="tab-content">${body}</div>
+      </div>
+    `;
+  }
+  function renderTab(id, label, iconId) {
+    return `
+      <button class="tab-btn${State.activeTab === id ? " active" : ""}" data-tab="${id}">
+        ${icon(iconId)}
+        <span class="lbl">${label}</span>
+      </button>
+    `;
+  }
+  function renderSessionControls(session) {
+    if (!State.isBartender) {
+      return `<div style="text-align: center; font-size: 12px; color: var(--cream-dim); font-family: 'Cormorant Garamond', serif; font-style: italic; padding: 6px 0;">
+        Viewing only — only the bartender can pour.
+      </div>`;
+    }
+    if (!session) {
+      return `<button class="btn btn-primary" id="btn-start-session" style="width: 100%;">${icon("play")}Open the bar</button>`;
+    }
+    return `
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <button class="btn btn-ghost" id="btn-undo" ${session.pours.length === 0 ? "disabled" : ""}>${icon("undo")}Undo</button>
+        <button class="btn btn-danger" id="btn-end-session">${icon("stop")}Close bar</button>
+      </div>
+    `;
+  }
+
+  function renderPourTab(session) {
+    const tonightCounts = {};
+    (session?.pours || []).forEach(p => { tonightCounts[p.friendId] = (tonightCounts[p.friendId] || 0) + 1; });
+
+    if (!State.isBartender) {
+      const ranked = State.barData.friends
+        .map(f => ({ ...f, tonight: tonightCounts[f.id] || 0 }))
+        .sort((a,b) => b.tonight - a.tonight);
+      return `
+        <div class="step-label">Tonight's tally</div>
+        <div class="patron-grid">
+          ${ranked.map(f => `
+            <div class="patron-card" style="cursor: default;">
+              ${monogram(f.name, "lg")}
+              <div class="nm">${escapeHtml(f.name)}</div>
+              <div class="ct">${f.tonight} tonight</div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    if (!State.selectedFriend) {
+      return `
+        <div class="step-label">Who's drinking?</div>
+        <div class="patron-grid">
+          ${State.barData.friends.map(f => `
+            <button class="patron-card" data-friend="${f.id}">
+              ${monogram(f.name, "lg")}
+              <div class="nm">${escapeHtml(f.name)}</div>
+              <div class="ct">${tonightCounts[f.id] || 0} tonight</div>
+            </button>
+          `).join("")}
+        </div>
+        ${State.barData.friends.length === 0 ? '<div class="empty-state">No patrons yet. Add some in the Patrons tab.</div>' : ''}
+      `;
+    }
+
+    const friend = State.barData.friends.find(f => f.id === State.selectedFriend);
+    if (!friend) { State.selectedFriend = null; return renderPourTab(session); }
+    return `
+      <button class="back-btn" id="btn-back-friends">${icon("back")}Back to patrons</button>
+      <div class="friend-detail">
+        ${monogram(friend.name, "xl", true)}
+        <div class="nm">${escapeHtml(friend.name)}</div>
+      </div>
+      <div class="step-label">Pick a tap</div>
+      <div>
+        ${[...State.barData.kegs].sort((a,b) => a.tap - b.tap).map(keg => {
+          const fullOz = KEG_SIZES[keg.size].oz;
+          const pct = (keg.remainingOz / fullOz) * 100;
+          const isEmpty = keg.remainingOz < POUR_OZ;
+          return `
+            <button class="keg-pour" ${isEmpty ? "disabled" : ""} data-keg="${keg.id}">
+              <div class="tap-circle">${keg.tap}</div>
+              <div class="info">
+                <div class="nm">${escapeHtml(keg.name)}</div>
+                <div class="meta">${escapeHtml(keg.brewery)} · ${escapeHtml(keg.style)}</div>
+                <div class="track"><div class="fill" style="width: ${pct}%;"></div></div>
+              </div>
+              <div class="right">
+                <div class="pct num">${Math.round(pct)}%</div>
+                ${isEmpty ? '<div class="empty-lbl">Empty</div>' : ''}
+              </div>
+            </button>
+          `;
+        }).join("")}
+      </div>
+    `;
+  }
+
+  function renderFriendsTab() {
+    if (!State.isBartender) {
+      return `
+        <div>
+          ${State.barData.friends.map(f => {
+            const stats = computeFriendStats(f.id);
+            const earned = getEarnedAchievements(f.id);
+            return `
+              <div class="friend-row">
+                ${monogram(f.name, "md")}
+                <div class="info">
+                  <div class="nm">${escapeHtml(f.name)}</div>
+                  <div class="meta">${stats.lifetime} lifetime · ${stats.sessionsAttended} sessions · ${earned.length} honours</div>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+    if (State.addingFriend || State.editingFriendId) {
+      const target = State.editingFriendId ? State.barData.friends.find(f => f.id === State.editingFriendId) : null;
+      return renderFriendForm(target);
+    }
+    return `
+      <button class="btn btn-primary" id="btn-add-friend" style="width: 100%; margin-bottom: 16px;">${icon("plus")}Add patron</button>
+      ${State.barData.friends.map(f => {
+        const stats = computeFriendStats(f.id);
+        const earned = getEarnedAchievements(f.id);
+        return `
+          <div class="friend-row">
+            ${monogram(f.name, "md")}
+            <div class="info">
+              <div class="nm">${escapeHtml(f.name)}</div>
+              <div class="meta">${stats.lifetime} lifetime · ${stats.sessionsAttended} sessions · ${earned.length} honours</div>
+            </div>
+            <button class="icon-btn" data-edit-friend="${f.id}">${icon("edit")}</button>
+          </div>
+        `;
+      }).join("")}
+    `;
+  }
+  function renderFriendForm(target) {
+    const name = target?.name || "";
+    return `
+      <div class="form-page">
+        <h2 class="serif">${target ? "Edit patron" : "New patron"}</h2>
+        <div class="field">
+          <label>Name</label>
+          <input type="text" id="ff-name" value="${escapeHtml(name)}" placeholder="Enter their name" />
+        </div>
+        <div class="field">
+          <label>Monogram preview</label>
+          <div class="mono-picker">
+            <div class="preview-wrap">
+              <div id="ff-preview">${monogram(name || "?", "lg")}</div>
+            </div>
+            <div class="preview-note">Initials are taken from the first and last name.</div>
+          </div>
+        </div>
+        <div class="form-actions ${target ? "three" : "two"}">
+          <button class="btn btn-ghost" id="ff-cancel">Cancel</button>
+          ${target ? `<button class="btn btn-danger" id="ff-delete">${icon("trash")}Delete</button>` : ""}
+          <button class="btn btn-primary" id="ff-save">Save</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderKegsTab() {
+    if (!State.isBartender) {
+      return `
+        <div>
+          ${[...State.barData.kegs].sort((a,b) => a.tap - b.tap).map(keg => {
+            const fullOz = KEG_SIZES[keg.size].oz;
+            const pct = (keg.remainingOz / fullOz) * 100;
+            return `
+              <div class="keg-edit">
+                <div class="head">
+                  <div class="tap-circle" style="width: 36px; height: 36px; border-radius: 50%; background: var(--gold-soft); color: var(--bg-deep); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 15px;">${keg.tap}</div>
+                  <div class="info">
+                    <div class="nm">${escapeHtml(keg.name)}</div>
+                    <div class="meta">${escapeHtml(keg.brewery)} · ${escapeHtml(keg.style)} · ${KEG_SIZES[keg.size].name}</div>
+                  </div>
+                </div>
+                <div class="level-track"><div class="level-fill" style="width: ${pct}%;"></div></div>
+                <div class="stats">
+                  <span class="num">${Math.round(keg.remainingOz)} of ${fullOz} oz</span>
+                  <span class="pct num">${Math.round(pct)}% · ${fmtMoney(keg.costCents)}</span>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+    if (State.editingKegId) {
+      const keg = State.barData.kegs.find(k => k.id === State.editingKegId);
+      if (!keg) { State.editingKegId = null; return renderKegsTab(); }
+      return renderKegForm(keg);
+    }
+    return `
+      <div>
+        ${[...State.barData.kegs].sort((a,b) => a.tap - b.tap).map(keg => {
+          const fullOz = KEG_SIZES[keg.size].oz;
+          const pct = (keg.remainingOz / fullOz) * 100;
+          return `
+            <div class="keg-edit">
+              <div class="head">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--gold-soft); color: var(--bg-deep); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 15px; flex-shrink: 0;">${keg.tap}</div>
+                <div class="info">
+                  <div class="nm">${escapeHtml(keg.name)}</div>
+                  <div class="meta">${escapeHtml(keg.brewery)} · ${escapeHtml(keg.style)} · ${KEG_SIZES[keg.size].name}</div>
+                </div>
+                <button class="icon-btn" data-edit-keg="${keg.id}">${icon("edit")}</button>
+              </div>
+              <div class="level-track"><div class="level-fill" style="width: ${pct}%;"></div></div>
+              <div class="stats">
+                <span class="num">${Math.round(keg.remainingOz)} of ${fullOz} oz</span>
+                <span class="pct num">${Math.round(pct)}% · ${fmtMoney(keg.costCents)}</span>
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
+  }
+  function renderKegForm(keg) {
+    return `
+      <div class="form-page">
+        <h2 class="serif">Tap ${keg.tap}</h2>
+        <div class="field"><label>Beer name</label><input type="text" id="kf-name" value="${escapeHtml(keg.name)}" /></div>
+        <div class="field"><label>Brewery</label><input type="text" id="kf-brewery" value="${escapeHtml(keg.brewery)}" /></div>
+        <div class="field"><label>Style</label><input type="text" id="kf-style" value="${escapeHtml(keg.style)}" /></div>
+        <div class="field"><label>Keg size</label>
+          <select id="kf-size">
+            ${Object.entries(KEG_SIZES).map(([k,v]) => `<option value="${k}"${k === keg.size ? " selected" : ""}>${v.name}</option>`).join("")}
+          </select>
+        </div>
+        <div class="field"><label>Cost ($)</label><input type="number" step="0.01" id="kf-cost" value="${(keg.costCents / 100).toFixed(2)}" /></div>
+        <div class="info-note">
+          <strong>Swap</strong> resets the keg to full at the new size. <strong>Update</strong> changes the information only.
+        </div>
+        <div class="form-actions three">
+          <button class="btn btn-ghost" id="kf-cancel">Cancel</button>
+          <button class="btn btn-ghost" id="kf-update">Update</button>
+          <button class="btn btn-primary" id="kf-swap">Swap keg</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderHistoryTab() {
+    const sortedSessions = [...State.barData.sessions].sort((a,b) => b.startedAt - a.startedAt);
+    if (sortedSessions.length === 0) {
+      return `<div class="empty-state">No sessions logged yet.</div>`;
+    }
+    return `
+      <div>
+        ${sortedSessions.map(sess => {
+          const counts = {};
+          sess.pours.forEach(p => { counts[p.friendId] = (counts[p.friendId] || 0) + 1; });
+          const topFriends = Object.entries(counts)
+            .map(([fid, c]) => ({ friend: State.barData.friends.find(f => f.id === fid), count: c }))
+            .filter(x => x.friend).sort((a,b) => b.count - a.count).slice(0, 3);
+          const duration = sess.endedAt ? Math.round((sess.endedAt - sess.startedAt) / 60000) : null;
+          return `
+            <div class="history-row">
+              <div class="head">
+                <div class="date">${fmtDate(sess.startedAt)} · ${fmtTime(sess.startedAt)}</div>
+                ${!sess.endedAt ? '<div class="live-tag">Live</div>' : ''}
+              </div>
+              <div class="stats-line">${sess.pours.length} pints poured${duration !== null ? ` · ${Math.floor(duration / 60)}h ${duration % 60}m` : ''}</div>
+              ${topFriends.length > 0 ? `
+                <div class="chips">
+                  ${topFriends.map(({friend, count}) => `<div class="friend-chip">${monogram(friend.name, "sm")}<span>${escapeHtml(friend.name.split(" ")[0])}</span><span class="num">${count}</span></div>`).join("")}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
+  }
+
+  function attachPhoneHandlers() {
+    $("#btn-phone-exit")?.addEventListener("click", () => { State.role = null; render(); });
+    document.querySelectorAll("[data-tab]").forEach(el => {
+      el.addEventListener("click", () => {
+        State.activeTab = el.dataset.tab;
+        State.selectedFriend = null;
+        State.editingFriendId = null;
+        State.addingFriend = false;
+        State.editingKegId = null;
+        render();
+      });
+    });
+    $("#btn-start-session")?.addEventListener("click", startSession);
+    $("#btn-end-session")?.addEventListener("click", endSession);
+    $("#btn-undo")?.addEventListener("click", undoLastPour);
+
+    document.querySelectorAll("[data-friend]").forEach(el => {
+      el.addEventListener("click", () => { State.selectedFriend = el.dataset.friend; render(); });
+    });
+    $("#btn-back-friends")?.addEventListener("click", () => { State.selectedFriend = null; render(); });
+    document.querySelectorAll("[data-keg]").forEach(el => {
+      el.addEventListener("click", async () => {
+        await logPour(State.selectedFriend, el.dataset.keg);
+        State.selectedFriend = null;
+        render();
+      });
+    });
+
+    $("#btn-add-friend")?.addEventListener("click", () => { State.addingFriend = true; render(); });
+    document.querySelectorAll("[data-edit-friend]").forEach(el => {
+      el.addEventListener("click", () => { State.editingFriendId = el.dataset.editFriend; render(); });
+    });
+
+    if (State.addingFriend || State.editingFriendId) {
+      const nameInput = $("#ff-name");
+      const preview = $("#ff-preview");
+      nameInput?.addEventListener("input", () => {
+        if (preview) preview.innerHTML = monogram(nameInput.value || "?", "lg");
+      });
+      $("#ff-cancel")?.addEventListener("click", () => {
+        State.addingFriend = false; State.editingFriendId = null; render();
+      });
+      $("#ff-save")?.addEventListener("click", async () => {
+        const name = nameInput.value.trim();
+        if (!name) { showToast("Enter a name", "warn"); return; }
+        if (State.editingFriendId) await updateFriend(State.editingFriendId, { name });
+        else await addFriend(name);
+        State.addingFriend = false; State.editingFriendId = null; render();
+      });
+      $("#ff-delete")?.addEventListener("click", async () => {
+        if (confirm("Delete this patron? Their stats will remain in past sessions.")) {
+          await deleteFriend(State.editingFriendId);
+          State.editingFriendId = null; render();
+        }
+      });
+    }
+
+    document.querySelectorAll("[data-edit-keg]").forEach(el => {
+      el.addEventListener("click", () => { State.editingKegId = el.dataset.editKeg; render(); });
+    });
+    if (State.editingKegId) {
+      $("#kf-cancel")?.addEventListener("click", () => { State.editingKegId = null; render(); });
+      $("#kf-update")?.addEventListener("click", async () => {
+        const data = {
+          name: $("#kf-name").value.trim(),
+          brewery: $("#kf-brewery").value.trim(),
+          style: $("#kf-style").value.trim(),
+          costCents: Math.round(parseFloat($("#kf-cost").value || "0") * 100)
+        };
+        await updateKeg(State.editingKegId, data);
+        State.editingKegId = null; render();
+      });
+      $("#kf-swap")?.addEventListener("click", async () => {
+        const data = {
+          name: $("#kf-name").value.trim(),
+          brewery: $("#kf-brewery").value.trim(),
+          style: $("#kf-style").value.trim(),
+          size: $("#kf-size").value,
+          costCents: Math.round(parseFloat($("#kf-cost").value || "0") * 100)
+        };
+        await swapKeg(State.editingKegId, data);
+        State.editingKegId = null; render();
+      });
+    }
+  }
+
+  // ========================================================
+  // BOOT
+  // ========================================================
+  (async function boot() {
+    if (!isConfigured) { render(); return; }
+    const ok = await initFirebase();
+    if (!ok) { $("#app").innerHTML = renderConfigWarning(); return; }
+    const savedCode = localStorage.getItem("taphouse_barCode");
+    if (savedCode) {
+      State.barCode = savedCode;
+      try {
+        const snap = await getDoc(doc(State.db, "bars", savedCode));
+        if (snap.exists()) { subscribeBar(); return; }
+        else { localStorage.removeItem("taphouse_barCode"); State.barCode = null; }
+      } catch (e) { console.warn("Couldn't resume saved bar:", e); }
+    }
+    render();
+  })();
+</script>
+
+</body>
+</html>

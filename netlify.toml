@@ -1,0 +1,13 @@
+# Netlify configuration for The Tap House
+# This file lives at the root of your repo; Netlify reads it automatically.
+
+[build]
+  publish = "."
+  # No build step needed — it's a single static HTML file
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

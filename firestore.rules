@@ -1,0 +1,38 @@
+rules_version = '2';
+
+// ==========================================================================
+// THE TAP HOUSE — FIRESTORE SECURITY RULES
+// ==========================================================================
+// Paste this into: Firebase Console → Firestore Database → Rules → Publish
+//
+// What these rules enforce:
+//   - Anyone signed in (anonymously) can READ bar data if they have the code
+//   - Only the original creator (bartender) can WRITE updates
+//   - Anyone signed in can CREATE a new bar (and they become its bartender)
+//   - Nobody can delete bars (data is precious)
+// ==========================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /bars/{barCode} {
+
+      // READ: anyone signed in can read (they need the code to find it anyway)
+      allow read: if request.auth != null;
+
+      // CREATE: anyone signed in can create a new bar — they become the bartender.
+      // The new doc must list them as the bartender so they (and only they) can update later.
+      allow create: if request.auth != null
+                    && request.resource.data.bartenderUid == request.auth.uid;
+
+      // UPDATE: only the original bartender can write,
+      // and they cannot change who the bartender is (no hijacking).
+      allow update: if request.auth != null
+                    && resource.data.bartenderUid == request.auth.uid
+                    && request.resource.data.bartenderUid == resource.data.bartenderUid;
+
+      // DELETE: nobody. Bars are forever.
+      allow delete: if false;
+    }
+  }
+}
