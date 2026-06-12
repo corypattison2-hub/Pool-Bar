@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- QR code library for the "scan to join" feature -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <style>
   :root {
     /* Warm Irish pub palette — refined, less saturated */
@@ -1081,6 +1083,218 @@
   .toast.warn { color: var(--amber); border-color: var(--amber); }
   .toast.info { color: var(--cream); }
 
+  /* === QR scan-to-join overlay on TV === */
+  .qr-corner {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--cream);
+    padding: 14px;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--gold-soft);
+  }
+  .qr-corner .qr-img {
+    width: 110px;
+    height: 110px;
+    display: block;
+  }
+  .qr-corner .qr-img canvas, .qr-corner .qr-img svg { width: 100% !important; height: 100% !important; display: block; }
+  .qr-corner .qr-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--bg-deep);
+    line-height: 1.1;
+    text-align: center;
+  }
+  .qr-corner .qr-sub {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--bg-deep);
+    opacity: 0.65;
+  }
+
+  /* === Welcome overlay (when a patron is approved) === */
+  .welcome-overlay {
+    position: fixed; inset: 0;
+    background: rgba(21, 13, 8, 0.94);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1100;
+    animation: fadeIn 0.4s;
+    backdrop-filter: blur(8px);
+  }
+  .welcome-card {
+    text-align: center;
+    padding: 64px 80px;
+    animation: scaleIn 0.5s;
+    max-width: 90vw;
+  }
+  .welcome-eyebrow {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--gold);
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
+  }
+  .welcome-mono-wrap {
+    display: flex; justify-content: center;
+    margin-bottom: 24px;
+  }
+  .welcome-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(48px, 8vw, 84px);
+    color: var(--cream);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    margin-bottom: 12px;
+  }
+  .welcome-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(40px, 7vw, 72px);
+    color: var(--gold-bright);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  .welcome-flourish {
+    margin-top: 24px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--cream-soft);
+  }
+
+  /* === Pending requests UI on phone === */
+  .pending-section {
+    margin-bottom: 18px;
+    padding: 14px;
+    background: rgba(184, 150, 86, 0.08);
+    border: 1px solid var(--gold-soft);
+    border-radius: 8px;
+  }
+  .pending-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .pending-header .label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gold-bright);
+  }
+  .pending-header .count {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--cream-dim);
+    font-weight: 500;
+  }
+  .pending-row {
+    padding: 12px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .pending-row .info { flex: 1; min-width: 0; }
+  .pending-row .nm {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--cream);
+    line-height: 1.1;
+  }
+  .pending-row .ago {
+    font-size: 11px;
+    color: var(--cream-dim);
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    margin-top: 2px;
+  }
+  .pending-row .actions {
+    display: flex;
+    gap: 6px;
+  }
+  .btn-mini {
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+  }
+  .btn-mini.approve {
+    background: var(--gold-soft);
+    color: var(--bg-deep);
+  }
+  .btn-mini.approve:hover { background: var(--gold-bright); }
+  .btn-mini.reject {
+    color: var(--cream-dim);
+    border-color: var(--border-strong);
+    background: transparent;
+  }
+  .btn-mini.reject:hover { color: var(--red); border-color: var(--red); }
+
+  /* Badge on tab */
+  .tab-btn { position: relative; }
+  .tab-btn .badge {
+    position: absolute;
+    top: 8px;
+    right: calc(50% - 18px);
+    width: 8px;
+    height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    border: 1.5px solid var(--bg-deep);
+    animation: softPulse 1.6s infinite;
+  }
+
+  /* === Pending requests TV peek (small banner above content) === */
+  .tv-pending-banner {
+    margin: 0 40px 24px;
+    padding: 12px 20px;
+    background: rgba(184, 150, 86, 0.1);
+    border: 1px solid var(--gold-soft);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: slideUp 0.4s;
+  }
+  .tv-pending-banner .text {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--gold-bright);
+  }
+  .tv-pending-banner .text .count {
+    font-style: normal;
+    font-weight: 600;
+    color: var(--gold-bright);
+  }
+  .tv-pending-banner .hint {
+    font-size: 12px;
+    color: var(--cream-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  /* === Join page (separate file uses same vars; included here for fallback) === */
+
   /* Loading */
   .loading {
     display: flex; align-items: center; justify-content: center;
@@ -1196,25 +1410,23 @@
     getAuth, signInAnonymously, onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import {
-    getFirestore, doc, setDoc, getDoc, onSnapshot, updateDoc
+    getFirestore, doc, setDoc, getDoc, onSnapshot, updateDoc,
+    collection, addDoc, deleteDoc, query, orderBy
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   // ========================================================
   // FIREBASE CONFIG — REPLACE WITH YOUR OWN VALUES
   // (See README.md for step-by-step instructions)
   // ========================================================
-const firebaseConfig = window.__FIREBASE_CONFIG__ || {
-    apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
-    authDomain: "pool-bar-57de0.firebaseapp.com",
-    projectId: "pool-bar-57de0",
-    storageBucket: "pool-bar-57de0.firebasestorage.app",
-    messagingSenderId: "91450372438",
-    appId: "1:91450372438:web:1f3599fe22e734b0e2e6f7"
+  const firebaseConfig = window.__FIREBASE_CONFIG__ || {
+    apiKey: "PASTE_YOUR_API_KEY",
+    authDomain: "PASTE_YOUR_AUTH_DOMAIN",
+    projectId: "PASTE_YOUR_PROJECT_ID",
+    storageBucket: "PASTE_YOUR_STORAGE_BUCKET",
+    messagingSenderId: "PASTE_YOUR_SENDER_ID",
+    appId: "PASTE_YOUR_APP_ID"
   };
   const isConfigured = !firebaseConfig.apiKey.startsWith("PASTE_");
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
 
   // ========================================================
   // CONSTANTS
@@ -1225,7 +1437,7 @@ const app = initializeApp(firebaseConfig);
     half:     { name: "1/2 Barrel (Full)",   oz: 1984 },
     cornelius:{ name: "Cornelius (Corny)",   oz: 640 }
   };
-  const POUR_OZ = 12;
+  const POUR_OZ = 16;
   const ROTATE_MS = 12000;
 
   const DEFAULT_FRIENDS = [
@@ -1241,7 +1453,7 @@ const app = initializeApp(firebaseConfig);
     { id: "k4", tap: 4, name: "Kilkenny",         brewery: "Kilkenny",         style: "Cream Ale", size: "sixth", remainingOz: 661,  costCents: 14000 }
   ];
   const ACHIEVEMENTS = [
-    { id: "first_pour",   name: "First Pour",   desc: "Welcome to The Pool Bar",   icon: "🍺" },
+    { id: "first_pour",   name: "First Pour",   desc: "Welcome to the snug",   icon: "🍺" },
     { id: "half_century", name: "Half Century", desc: "50 lifetime pints",     icon: "🎯" },
     { id: "century",      name: "Century Club", desc: "100 lifetime pints",    icon: "💯" },
     { id: "regular",      name: "The Regular",  desc: "5 sessions attended",   icon: "🎖️" },
@@ -1263,6 +1475,9 @@ const app = initializeApp(firebaseConfig);
     isBartender: false,
     barData: null,
     unsubscribe: null,
+    requestsUnsubscribe: null,
+    pendingRequests: [],
+    seenApprovals: new Set(), // track approved IDs so TV doesn't re-show welcome
     viewIdx: 0,
     rotateInterval: null,
     selectedFriend: null,
@@ -1271,6 +1486,7 @@ const app = initializeApp(firebaseConfig);
     addingFriend: false,
     editingKegId: null
   };
+  const REQUEST_EXPIRY_MS = 30 * 60 * 1000; // 30 minutes
 
   // ========================================================
   // HELPERS
@@ -1375,7 +1591,20 @@ const app = initializeApp(firebaseConfig);
         const oldLastPour = oldSession?.pours?.[oldSession.pours.length - 1];
         const newLastPour = newSession?.pours?.[newSession.pours.length - 1];
         if (newLastPour && newLastPour.id !== oldLastPour?.id) showNowPouring(newLastPour);
+
+        // Detect newly-added patrons → show welcome overlay on TV
+        const oldIds = new Set((prev.friends || []).map(f => f.id));
+        const newPatrons = (data.friends || []).filter(f => !oldIds.has(f.id));
+        newPatrons.forEach(f => {
+          // Only show welcome for newly-approved patrons (carry an `approvedAt` flag)
+          if (f.approvedAt && !State.seenApprovals.has(f.id)) {
+            State.seenApprovals.add(f.id);
+            showWelcomeOverlay(f);
+          }
+        });
       }
+      // Always make sure we're subscribed to requests for this bar
+      if (!State.requestsUnsubscribe) subscribeRequests();
       render();
     }, (err) => {
       console.error("Subscribe error:", err);
@@ -1386,6 +1615,59 @@ const app = initializeApp(firebaseConfig);
     const docRef = doc(State.db, "bars", State.barCode);
     const next = updater(structuredClone(State.barData));
     await updateDoc(docRef, next);
+  }
+
+  // ========================================================
+  // JOIN REQUESTS (QR-scan flow)
+  // ========================================================
+  function subscribeRequests() {
+    if (State.requestsUnsubscribe) State.requestsUnsubscribe();
+    const requestsRef = collection(State.db, "bars", State.barCode, "requests");
+    const q = query(requestsRef, orderBy("createdAt", "asc"));
+    State.requestsUnsubscribe = onSnapshot(q, (snap) => {
+      const now = Date.now();
+      const fresh = [];
+      const expired = [];
+      snap.forEach(d => {
+        const data = d.data();
+        const age = now - (data.createdAt || 0);
+        if (age > REQUEST_EXPIRY_MS) {
+          expired.push(d.id);
+        } else {
+          fresh.push({ id: d.id, ...data });
+        }
+      });
+      State.pendingRequests = fresh;
+      // Bartender silently cleans up expired requests
+      if (State.isBartender && expired.length > 0) {
+        expired.forEach(id => {
+          deleteDoc(doc(State.db, "bars", State.barCode, "requests", id)).catch(() => {});
+        });
+      }
+      render();
+    }, (err) => {
+      console.warn("Requests subscribe error:", err);
+    });
+  }
+
+  async function approveRequest(requestId) {
+    if (!State.isBartender) return;
+    const req = State.pendingRequests.find(r => r.id === requestId);
+    if (!req) return;
+    // Add patron with approvedAt timestamp and the request ID (so the requester knows it was them)
+    await updateBar(d => {
+      d.friends = [...d.friends, { id: uid(), name: req.name, approvedAt: Date.now(), approvedFromRequest: requestId }];
+      return { friends: d.friends };
+    });
+    // Remove the request
+    try { await deleteDoc(doc(State.db, "bars", State.barCode, "requests", requestId)); } catch (e) { console.warn(e); }
+    showToast(`Welcome, ${req.name}!`, "success");
+  }
+
+  async function rejectRequest(requestId) {
+    if (!State.isBartender) return;
+    try { await deleteDoc(doc(State.db, "bars", State.barCode, "requests", requestId)); } catch (e) { console.warn(e); }
+    showToast("Request dismissed", "info");
   }
 
   // ========================================================
@@ -1541,7 +1823,7 @@ const app = initializeApp(firebaseConfig);
           <div class="brand">
             <div class="eyebrow">Established</div>
             <h1 class="serif">The Pool Bar</h1>
-            <div class="tagline">Sláinte Mhaith</div>
+            <div class="tagline">Sláinte mhaith</div>
           </div>
           <div class="config-warning">
             <h3>Setup needed</h3>
@@ -1658,6 +1940,9 @@ const app = initializeApp(firebaseConfig);
     });
     $("#btn-leave-bar")?.addEventListener("click", () => {
       if (State.unsubscribe) State.unsubscribe();
+      if (State.requestsUnsubscribe) { State.requestsUnsubscribe(); State.requestsUnsubscribe = null; }
+      State.pendingRequests = [];
+      State.seenApprovals = new Set();
       localStorage.removeItem("taphouse_barCode");
       State.barCode = null; State.barData = null; State.role = null;
       render();
@@ -1682,6 +1967,14 @@ const app = initializeApp(firebaseConfig);
     else if (views[State.viewIdx] === "achievements") content = renderTVAchievements();
     else if (views[State.viewIdx] === "stats") content = renderTVStats(session);
 
+    const pendingCount = State.pendingRequests.length;
+    const pendingBanner = pendingCount > 0
+      ? `<div class="tv-pending-banner">
+          <div class="text"><span class="count">${pendingCount}</span> ${pendingCount === 1 ? "patron is" : "patrons are"} waiting at the door</div>
+          <div class="hint">Bartender approves on phone</div>
+        </div>`
+      : "";
+
     return `
       <div class="app-bg grain tv-shell">
         <div class="tv-header">
@@ -1694,7 +1987,13 @@ const app = initializeApp(firebaseConfig);
           </div>
           <button class="icon-btn" id="btn-tv-exit">${icon("x")}</button>
         </div>
+        ${pendingBanner}
         <div class="tv-content">${content}</div>
+        <div class="qr-corner" id="tv-qr">
+          <div class="qr-img" id="tv-qr-img"></div>
+          <div class="qr-label">Scan to join the bar</div>
+          <div class="qr-sub">${escapeHtml(State.barCode || "")}</div>
+        </div>
       </div>
     `;
   }
@@ -1704,6 +2003,28 @@ const app = initializeApp(firebaseConfig);
       State.role = null;
       render();
     });
+    // Render the QR code for the join URL
+    renderQRCode();
+  }
+
+  function renderQRCode() {
+    const container = $("#tv-qr-img");
+    if (!container || !State.barCode) return;
+    // Build the join URL — same origin, /join.html with the bar code
+    const joinUrl = `${window.location.origin}/join.html?bar=${encodeURIComponent(State.barCode)}`;
+    container.innerHTML = ""; // Clear previous
+    if (typeof QRCode !== "undefined" && QRCode.toCanvas) {
+      const canvas = document.createElement("canvas");
+      container.appendChild(canvas);
+      QRCode.toCanvas(canvas, joinUrl, {
+        width: 110,
+        margin: 1,
+        color: { dark: "#1a0e07", light: "#ede2cc" }
+      }, (err) => { if (err) console.warn("QR render error:", err); });
+    } else {
+      // Fallback: show the URL as text
+      container.innerHTML = `<div style="font-size: 9px; color: #1a0e07; padding: 6px;">${escapeHtml(joinUrl)}</div>`;
+    }
   }
 
   function tvHeading(eyebrow, title, sub) {
@@ -1896,6 +2217,36 @@ const app = initializeApp(firebaseConfig);
     setTimeout(() => overlay.remove(), 4500);
   }
 
+  // Reads the H1 from the TV header so the welcome message stays in sync with title changes
+  function getBarName() {
+    // Default fallback if not yet rendered
+    return document.querySelector(".tv-brand h1")?.textContent || "The Pool Bar";
+  }
+
+  function showWelcomeOverlay(friend) {
+    const existing = document.querySelector(".welcome-overlay");
+    if (existing) existing.remove();
+    // Pause TV rotation while welcome is displayed
+    if (State.rotateInterval) { clearInterval(State.rotateInterval); State.rotateInterval = null; }
+    const overlay = document.createElement("div");
+    overlay.className = "welcome-overlay";
+    overlay.innerHTML = `
+      <div class="welcome-card">
+        <div class="welcome-eyebrow">A new patron arrives</div>
+        <div class="welcome-mono-wrap">${monogram(friend.name, "xxl", true)}</div>
+        <div class="welcome-headline serif">Welcome to ${escapeHtml(getBarName())}</div>
+        <div class="welcome-name serif">${escapeHtml(friend.name)}</div>
+        <div class="welcome-flourish">Sláinte. Make yourself at home.</div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    setTimeout(() => {
+      overlay.remove();
+      // Resume TV rotation
+      if (State.role === "tv" && !State.rotateInterval) startTVRotation();
+    }, 6000);
+  }
+
   // ====== PHONE ======
   function renderPhone() {
     const session = State.barData.sessions.find(s => s.id === State.barData.currentSessionId);
@@ -1910,7 +2261,7 @@ const app = initializeApp(firebaseConfig);
         <div class="phone-header">
           <div class="top">
             <div style="min-width: 0;">
-              <h1>${State.isBartender ? "Barkeep's Book" : "The Pool Bar"}</h1>
+              <h1>${State.isBartender ? "Barkeep's Book" : "The Snug"}</h1>
               <div class="status ${session ? "live" : ""}"><span class="dot"></span>${session ? "Active session" : "No session"}</div>
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
@@ -1931,10 +2282,12 @@ const app = initializeApp(firebaseConfig);
     `;
   }
   function renderTab(id, label, iconId) {
+    const showBadge = id === "friends" && State.isBartender && State.pendingRequests.length > 0;
     return `
       <button class="tab-btn${State.activeTab === id ? " active" : ""}" data-tab="${id}">
         ${icon(iconId)}
         <span class="lbl">${label}</span>
+        ${showBadge ? '<span class="badge"></span>' : ''}
       </button>
     `;
   }
@@ -2051,6 +2404,7 @@ const app = initializeApp(firebaseConfig);
       return renderFriendForm(target);
     }
     return `
+      ${renderPendingRequestsSection()}
       <button class="btn btn-primary" id="btn-add-friend" style="width: 100%; margin-bottom: 16px;">${icon("plus")}Add patron</button>
       ${State.barData.friends.map(f => {
         const stats = computeFriendStats(f.id);
@@ -2066,6 +2420,35 @@ const app = initializeApp(firebaseConfig);
           </div>
         `;
       }).join("")}
+    `;
+  }
+
+  function renderPendingRequestsSection() {
+    if (!State.isBartender || State.pendingRequests.length === 0) return "";
+    return `
+      <div class="pending-section">
+        <div class="pending-header">
+          <div class="label">At the door</div>
+          <div class="count">${State.pendingRequests.length} ${State.pendingRequests.length === 1 ? "request" : "requests"}</div>
+        </div>
+        ${State.pendingRequests.map(r => {
+          const mins = Math.floor((Date.now() - (r.createdAt || 0)) / 60000);
+          const ago = mins < 1 ? "just now" : `${mins} min ago`;
+          return `
+            <div class="pending-row">
+              ${monogram(r.name, "md")}
+              <div class="info">
+                <div class="nm">${escapeHtml(r.name)}</div>
+                <div class="ago">${ago}</div>
+              </div>
+              <div class="actions">
+                <button class="btn-mini reject" data-reject="${r.id}">Dismiss</button>
+                <button class="btn-mini approve" data-approve="${r.id}">Welcome in</button>
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
     `;
   }
   function renderFriendForm(target) {
@@ -2242,6 +2625,22 @@ const app = initializeApp(firebaseConfig);
     $("#btn-add-friend")?.addEventListener("click", () => { State.addingFriend = true; render(); });
     document.querySelectorAll("[data-edit-friend]").forEach(el => {
       el.addEventListener("click", () => { State.editingFriendId = el.dataset.editFriend; render(); });
+    });
+
+    // Pending request handlers
+    document.querySelectorAll("[data-approve]").forEach(el => {
+      el.addEventListener("click", async () => {
+        const btn = el; btn.disabled = true;
+        try { await approveRequest(el.dataset.approve); }
+        catch (e) { console.error(e); showToast("Couldn't approve", "warn"); btn.disabled = false; }
+      });
+    });
+    document.querySelectorAll("[data-reject]").forEach(el => {
+      el.addEventListener("click", async () => {
+        const btn = el; btn.disabled = true;
+        try { await rejectRequest(el.dataset.reject); }
+        catch (e) { console.error(e); showToast("Couldn't dismiss", "warn"); btn.disabled = false; }
+      });
     });
 
     if (State.addingFriend || State.editingFriendId) {
