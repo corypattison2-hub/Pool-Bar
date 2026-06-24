@@ -204,7 +204,7 @@
   <div class="wrap">
     <div class="brand">
       <div class="eyebrow">Welcome to</div>
-      <h1>The Tap House</h1>
+      <h1>The Pool Bar</h1>
       <div class="tagline">Ask the bartender to let you in</div>
     </div>
     <div id="content">
@@ -231,12 +231,12 @@
   // FIREBASE CONFIG — SAME VALUES AS index.html
   // ========================================================
   const firebaseConfig = window.__FIREBASE_CONFIG__ || {
-apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
-  authDomain: "pool-bar-57de0.firebaseapp.com",
-  projectId: "pool-bar-57de0",
-  storageBucket: "pool-bar-57de0.firebasestorage.app",
-  messagingSenderId: "91450372438",
-  appId: "1:91450372438:web:1f3599fe22e734b0e2e6f7"
+    apiKey: "PASTE_YOUR_API_KEY",
+    authDomain: "PASTE_YOUR_AUTH_DOMAIN",
+    projectId: "PASTE_YOUR_PROJECT_ID",
+    storageBucket: "PASTE_YOUR_STORAGE_BUCKET",
+    messagingSenderId: "PASTE_YOUR_SENDER_ID",
+    appId: "PASTE_YOUR_APP_ID"
   };
   const isConfigured = !firebaseConfig.apiKey.startsWith("PASTE_");
 
@@ -289,10 +289,17 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
         <div class="state-approved">
           <div class="check">✓</div>
           <h2>You're in</h2>
-          <p class="sub">Welcome to the bar, ${escapeHtml(name)}.<br/>Your pints will be tracked on the leaderboard.</p>
+          <p class="sub">Welcome to the bar, ${escapeHtml(name)}.<br/>Taking you to the live leaderboard…</p>
         </div>
       </div>
     `;
+    // Remember the bar code so the main app picks up where we left off in spectator mode
+    try { localStorage.setItem("taphouse_barCode", barCode); } catch {}
+    setTimeout(() => {
+      // Send them to the main app. They're already signed in (anonymous auth persists),
+      // and the saved bar code triggers auto-resume → role selector → they pick Spectator
+      window.location.href = `${window.location.origin}/?spectator=1`;
+    }, 2200);
   }
 
   function renderError(title, message) {
@@ -389,7 +396,7 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
         renderError("Bar not found", "That bar code doesn't exist. Ask for the right link.");
         return;
       }
-      const barName = "The Tap House"; // The brand name shown — kept in sync with index.html
+      const barName = "The Pool Bar"; // The brand name shown — kept in sync with index.html
       // Check if we already have a pending request
       const saved = sessionStorage.getItem("taphouse_request_" + barCode);
       if (saved) {
