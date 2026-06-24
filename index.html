@@ -1101,43 +1101,288 @@
   .toast.warn { color: var(--amber); border-color: var(--amber); }
   .toast.info { color: var(--cream); }
 
-  /* === QR scan-to-join overlay on TV === */
-  .qr-corner {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
+  /* === QR scan-to-join (placed in heading of leaderboard view) === */
+  .lb-heading-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    margin-bottom: 32px;
+  }
+  .lb-heading-row .tv-heading { margin-bottom: 0; flex: 1; }
+  .lb-qr-card {
     background: var(--cream);
-    padding: 14px;
+    padding: 12px;
     border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-    z-index: 50;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    border: 1px solid var(--gold-soft);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 6px;
-    border: 1px solid var(--gold-soft);
+    flex-shrink: 0;
   }
-  .qr-corner .qr-img {
-    width: 110px;
-    height: 110px;
+  .lb-qr-card .qr-img {
+    width: 95px;
+    height: 95px;
     display: block;
   }
-  .qr-corner .qr-img canvas, .qr-corner .qr-img svg { width: 100% !important; height: 100% !important; display: block; }
-  .qr-corner .qr-label {
+  .lb-qr-card .qr-img img, .lb-qr-card .qr-img svg { width: 100%; height: 100%; display: block; }
+  .lb-qr-card .qr-label {
     font-family: 'Cormorant Garamond', serif;
     font-style: italic;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--bg-deep);
     line-height: 1.1;
     text-align: center;
   }
-  .qr-corner .qr-sub {
-    font-size: 9px;
+  .lb-qr-card .qr-sub {
+    font-size: 8px;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     color: var(--bg-deep);
-    opacity: 0.65;
+    opacity: 0.6;
   }
+
+  /* === Pace stat on TV leaderboard === */
+  .pace-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--gold-bright);
+    background: rgba(184, 150, 86, 0.12);
+    padding: 3px 7px;
+    border-radius: 4px;
+    margin-left: 8px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* === Drink type picker (phone) === */
+  .drink-type-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .drink-type-btn {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 22px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .drink-type-btn:hover:not(:disabled) { background: var(--bg-elevated); border-color: var(--gold-soft); }
+  .drink-type-btn:active:not(:disabled) { transform: scale(0.98); }
+  .drink-type-btn .icon-big {
+    font-size: 32px;
+    line-height: 1;
+  }
+  .drink-type-btn .lbl {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--cream);
+    line-height: 1.15;
+  }
+  .drink-type-btn .sub {
+    font-size: 11px;
+    color: var(--cream-dim);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+
+  /* === Size picker (half / full pint) === */
+  .size-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .size-btn {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+  }
+  .size-btn:hover { background: var(--bg-elevated); border-color: var(--gold-soft); }
+  .size-btn .glass-emoji { font-size: 40px; line-height: 1; }
+  .size-btn.half .glass-emoji { font-size: 32px; opacity: 0.9; }
+  .size-btn .lbl {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--cream);
+  }
+  .size-btn .sub {
+    font-size: 11px;
+    color: var(--cream-dim);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+
+  /* === Category breakdown on leaderboard === */
+  .category-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .cat-chip {
+    font-size: 10px;
+    color: var(--cream-soft);
+    background: rgba(244, 233, 209, 0.06);
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    line-height: 1.2;
+  }
+  .cat-chip .ic { font-size: 11px; }
+  .cat-chip .ct { color: var(--gold-bright); font-weight: 600; }
+
+  /* === Rivalry overlay (TV) === */
+  .rivalry-overlay {
+    position: fixed; inset: 0;
+    background: rgba(21, 13, 8, 0.92);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1050;
+    animation: fadeIn 0.4s;
+    backdrop-filter: blur(6px);
+  }
+  .rivalry-card {
+    text-align: center;
+    padding: 48px 64px;
+    animation: scaleIn 0.45s;
+  }
+  .rivalry-eyebrow {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--amber);
+    margin-bottom: 18px;
+    letter-spacing: 0.06em;
+  }
+  .rivalry-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 6vw, 56px);
+    color: var(--cream);
+    font-weight: 500;
+    line-height: 1.05;
+    margin-bottom: 32px;
+    letter-spacing: -0.01em;
+  }
+  .rivalry-pair {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+  }
+  .rivalry-vs {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 30px;
+    color: var(--gold-bright);
+  }
+  .rivalry-side {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .rivalry-side .nm {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--cream);
+  }
+  .rivalry-side .ct {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    color: var(--gold-bright);
+    font-weight: 600;
+    line-height: 1;
+  }
+  .rivalry-side .lbl {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--cream-dim);
+  }
+
+  /* === Active bartender toggle (phone) === */
+  .bartender-status-card {
+    margin-bottom: 14px;
+    padding: 14px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .bartender-status-card .info {
+    flex: 1;
+    min-width: 0;
+  }
+  .bartender-status-card .lbl {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--cream);
+  }
+  .bartender-status-card .desc {
+    font-size: 11px;
+    color: var(--cream-dim);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    margin-top: 2px;
+  }
+  .toggle-switch {
+    width: 46px;
+    height: 26px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .toggle-switch.on {
+    background: var(--gold-soft);
+    border-color: var(--gold);
+  }
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 20px; height: 20px;
+    background: var(--cream);
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+  .toggle-switch.on::after {
+    transform: translateX(20px);
+    background: var(--bg-deep);
+  }
+
+  /* Old QR corner removed (no longer used) */
+  .qr-corner { display: none; }
 
   /* === Welcome overlay (when a patron is approved) === */
   .welcome-overlay {
@@ -1520,12 +1765,12 @@
   // (See README.md for step-by-step instructions)
   // ========================================================
   const firebaseConfig = window.__FIREBASE_CONFIG__ || {
-apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
-  authDomain: "pool-bar-57de0.firebaseapp.com",
-  projectId: "pool-bar-57de0",
-  storageBucket: "pool-bar-57de0.firebasestorage.app",
-  messagingSenderId: "91450372438",
-  appId: "1:91450372438:web:1f3599fe22e734b0e2e6f7"
+    apiKey: "PASTE_YOUR_API_KEY",
+    authDomain: "PASTE_YOUR_AUTH_DOMAIN",
+    projectId: "PASTE_YOUR_PROJECT_ID",
+    storageBucket: "PASTE_YOUR_STORAGE_BUCKET",
+    messagingSenderId: "PASTE_YOUR_SENDER_ID",
+    appId: "PASTE_YOUR_APP_ID"
   };
   const isConfigured = !firebaseConfig.apiKey.startsWith("PASTE_");
 
@@ -1539,7 +1784,23 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
     cornelius:{ name: "Cornelius (Corny)",   oz: 640 }
   };
   const POUR_OZ = 16;
+  const HALF_POUR_OZ = 8;
   const ROTATE_MS = 12000;
+
+  // Drink categories. Each pour records its category; only beer_tap deducts a keg.
+  const DRINK_CATEGORIES = {
+    beer_tap:  { label: "Beer (tap)",  icon: "🍺", deductsKeg: true,  needsSize: true  },
+    beer_can:  { label: "Beer (can)",  icon: "🥫", deductsKeg: false, needsSize: false },
+    cocktail:  { label: "Cocktail",    icon: "🍸", deductsKeg: false, needsSize: false },
+    wine:      { label: "Wine",        icon: "🍷", deductsKeg: false, needsSize: false },
+    mixed:     { label: "Mixed drink", icon: "🥃", deductsKeg: false, needsSize: false },
+    shot:      { label: "Shot",        icon: "🥂", deductsKeg: false, needsSize: false }
+  };
+
+  // Rivalry overlay tuning
+  const RIVALRY_MIN_POURS = 3;       // Both patrons need at least this many tonight
+  const RIVALRY_CHECK_INTERVAL_MS = 45_000; // How often the TV considers showing a rivalry
+  const RIVALRY_COOLDOWN_MS = 3 * 60_000;  // Don't repeat the same pairing within 3 minutes
 
   const DEFAULT_FRIENDS = [
     { id: "f1", name: "Marcus Walker" },
@@ -1554,7 +1815,7 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
     { id: "k4", tap: 4, name: "Kilkenny",         brewery: "Kilkenny",         style: "Cream Ale", size: "sixth", remainingOz: 661,  costCents: 14000 }
   ];
   const ACHIEVEMENTS = [
-    { id: "first_pour",   name: "First Pour",   desc: "Welcome to The Pool Bar",   icon: "🍺" },
+    { id: "first_pour",   name: "First Pour",   desc: "Welcome to the snug",   icon: "🍺" },
     { id: "half_century", name: "Half Century", desc: "50 lifetime pints",     icon: "🎯" },
     { id: "century",      name: "Century Club", desc: "100 lifetime pints",    icon: "💯" },
     { id: "regular",      name: "The Regular",  desc: "5 sessions attended",   icon: "🎖️" },
@@ -1586,8 +1847,15 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
     editingFriendId: null,
     addingFriend: false,
     editingKegId: null,
-    inviteModal: null, // { inviteId, url, expiresAt }
-    pickingPatron: false // bartender hasn't linked their patron yet
+    inviteModal: null,
+    pickingPatron: false,
+    // Pour flow state (set after a patron is selected on the phone)
+    pourCategory: null, // "beer_tap" | "beer_can" | "cocktail" | "wine" | "mixed" | "shot"
+    pourSize: null,     // "half" | "full" (only for beer_tap)
+    // Active-bartender toggle (per-device, stored in barData.activeBartenderUids)
+    // Rivalry tracking
+    lastRivalryAt: 0,
+    lastRivalryPair: null
   };
   const REQUEST_EXPIRY_MS = 30 * 60 * 1000; // 30 minutes
 
@@ -2212,6 +2480,34 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
     const roster = getBartenderRoster();
     return roster.some(b => b.friendId === friendId);
   }
+  // Is a bartender's "actively bartending" toggle currently ON?
+  function isUidActivelyBartending(uid) {
+    if (!State.barData) return false;
+    const active = State.barData.activeBartenderUids;
+    return Array.isArray(active) && active.includes(uid);
+  }
+  function amIActivelyBartending() {
+    return State.isBartender && isUidActivelyBartending(State.user.uid);
+  }
+  async function setMyActiveBartending(on) {
+    if (!State.isBartender) return;
+    await updateBar(d => {
+      const current = Array.isArray(d.activeBartenderUids) ? d.activeBartenderUids : [];
+      let next;
+      if (on) {
+        next = current.includes(State.user.uid) ? current : [...current, State.user.uid];
+      } else {
+        next = current.filter(u => u !== State.user.uid);
+      }
+      return { activeBartenderUids: next };
+    });
+  }
+  // Is the patron currently shown as "Bartender" on TV? (i.e., they're a bartender
+  // AND that bartender has set themselves to active)
+  function isPatronActivelyBartending(friendId) {
+    const roster = getBartenderRoster();
+    return roster.some(b => b.friendId === friendId && isUidActivelyBartending(b.uid));
+  }
 
   // ========================================================
   // ACHIEVEMENT LOGIC
@@ -2270,25 +2566,58 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
     });
     showToast("Session closed. Stats saved.", "info");
   }
-  async function logPour(friendId, kegId) {
+  // logPour now takes an options object: { category, size, kegId }
+  //   - category: "beer_tap" | "beer_can" | "cocktail" | "wine" | "mixed" | "shot"
+  //   - size: "half" | "full" (only for beer_tap; defaults to "full")
+  //   - kegId: required only for beer_tap
+  async function logPour(friendId, opts) {
     if (!State.isBartender) { showToast("Only the bartender can pour", "warn"); return; }
     if (!State.barData.currentSessionId) { showToast("Start a session first", "warn"); return; }
-    const keg = State.barData.kegs.find(k => k.id === kegId);
-    if (!keg || keg.remainingOz < POUR_OZ) { showToast("That keg is dry", "warn"); return; }
+    const category = opts?.category || "beer_tap";
+    const size = opts?.size || "full";
+    const kegId = opts?.kegId || null;
+    const catSpec = DRINK_CATEGORIES[category];
+    if (!catSpec) { showToast("Unknown drink category", "warn"); return; }
     const friend = State.barData.friends.find(f => f.id === friendId);
-    const newRemaining = keg.remainingOz - POUR_OZ;
-    const isKegKill = newRemaining < POUR_OZ && keg.remainingOz >= POUR_OZ;
+    if (!friend) { showToast("Patron not found", "warn"); return; }
+
+    let kegDeduction = 0;
+    let isKegKill = false;
+    let kegName = null;
+    if (catSpec.deductsKeg) {
+      const keg = State.barData.kegs.find(k => k.id === kegId);
+      if (!keg) { showToast("Pick a tap", "warn"); return; }
+      kegDeduction = size === "half" ? HALF_POUR_OZ : POUR_OZ;
+      if (keg.remainingOz < kegDeduction) { showToast("That keg is dry", "warn"); return; }
+      isKegKill = (keg.remainingOz - kegDeduction) < HALF_POUR_OZ && keg.remainingOz >= kegDeduction;
+      kegName = keg.name;
+    }
+
     const session = State.barData.sessions.find(s => s.id === State.barData.currentSessionId);
     const isFirstOfNight = session && session.pours.length === 0;
+
     await updateBar(d => {
-      d.kegs = d.kegs.map(k => k.id === kegId ? { ...k, remainingOz: newRemaining } : k);
+      if (catSpec.deductsKeg && kegId) {
+        d.kegs = d.kegs.map(k => k.id === kegId ? { ...k, remainingOz: k.remainingOz - kegDeduction } : k);
+      }
       d.sessions = d.sessions.map(s => s.id === d.currentSessionId
-        ? { ...s, pours: [...s.pours, { id: uid(), friendId, kegId, ts: Date.now(), kegKill: isKegKill, firstOfNight: isFirstOfNight }] }
+        ? { ...s, pours: [...s.pours, {
+            id: uid(),
+            friendId,
+            kegId: catSpec.deductsKeg ? kegId : null,
+            category,
+            size: catSpec.needsSize ? size : null,
+            ts: Date.now(),
+            kegKill: isKegKill,
+            firstOfNight: isFirstOfNight
+          }] }
         : s);
       return { kegs: d.kegs, sessions: d.sessions };
     });
-    if (isKegKill) showToast(`${friend.name} drained the ${keg.name}`, "kill");
-    else showToast(`Poured for ${friend.name}`, "pour");
+
+    if (isKegKill) showToast(`${friend.name} drained the ${kegName}`, "kill");
+    else if (catSpec.deductsKeg) showToast(`Poured for ${friend.name}${size === "half" ? " (half)" : ""}`, "pour");
+    else showToast(`${friend.name} → ${catSpec.label.toLowerCase()}`, "pour");
   }
   async function undoLastPour() {
     if (!State.isBartender) return;
@@ -2296,7 +2625,14 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
     if (!session || session.pours.length === 0) return;
     const last = session.pours[session.pours.length - 1];
     await updateBar(d => {
-      d.kegs = d.kegs.map(k => k.id === last.kegId ? { ...k, remainingOz: k.remainingOz + POUR_OZ } : k);
+      // Refund keg only if this pour was a beer_tap that deducted
+      if (last.kegId && last.category !== "beer_can" && last.category !== "cocktail" && last.category !== "wine" && last.category !== "mixed" && last.category !== "shot") {
+        const deduction = last.size === "half" ? HALF_POUR_OZ : POUR_OZ;
+        d.kegs = d.kegs.map(k => k.id === last.kegId ? { ...k, remainingOz: k.remainingOz + deduction } : k);
+      } else if (last.kegId && !last.category) {
+        // Legacy pours (pre-category) deducted full POUR_OZ from a keg
+        d.kegs = d.kegs.map(k => k.id === last.kegId ? { ...k, remainingOz: k.remainingOz + POUR_OZ } : k);
+      }
       d.sessions = d.sessions.map(s => s.id === d.currentSessionId ? { ...s, pours: s.pours.slice(0, -1) } : s);
       return { kegs: d.kegs, sessions: d.sessions };
     });
@@ -2511,6 +2847,74 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
       State.viewIdx = (State.viewIdx + 1) % 4;
       render();
     }, ROTATE_MS);
+    // Periodic rivalry check
+    if (State.rivalryInterval) clearInterval(State.rivalryInterval);
+    State.rivalryInterval = setInterval(maybeShowRivalry, RIVALRY_CHECK_INTERVAL_MS);
+  }
+
+  function maybeShowRivalry() {
+    if (State.role !== "tv") return;
+    // Don't compete with other overlays
+    if (document.querySelector(".welcome-overlay") || document.querySelector(".pouring-overlay") || document.querySelector(".rivalry-overlay")) return;
+    const session = State.barData.sessions.find(s => s.id === State.barData.currentSessionId);
+    if (!session) return;
+    const counts = {};
+    session.pours.forEach(p => { counts[p.friendId] = (counts[p.friendId] || 0) + 1; });
+    const ranked = State.barData.friends
+      .map(f => ({ id: f.id, name: f.name, count: counts[f.id] || 0 }))
+      .filter(f => f.count >= RIVALRY_MIN_POURS)
+      .sort((a, b) => b.count - a.count);
+    if (ranked.length < 2) return;
+    // Find the closest adjacent pair within 1 of each other
+    let pair = null;
+    for (let i = 0; i < ranked.length - 1; i++) {
+      if (Math.abs(ranked[i].count - ranked[i + 1].count) <= 1) {
+        pair = [ranked[i], ranked[i + 1]];
+        break;
+      }
+    }
+    if (!pair) return;
+    // Cooldown — don't repeat same pairing
+    const pairKey = [pair[0].id, pair[1].id].sort().join("|");
+    if (State.lastRivalryPair === pairKey && (Date.now() - State.lastRivalryAt) < RIVALRY_COOLDOWN_MS) return;
+    State.lastRivalryPair = pairKey;
+    State.lastRivalryAt = Date.now();
+    showRivalryOverlay(pair[0], pair[1]);
+  }
+
+  function showRivalryOverlay(a, b) {
+    const existing = document.querySelector(".rivalry-overlay");
+    if (existing) existing.remove();
+    // Pause rotation while rivalry displays
+    if (State.rotateInterval) { clearInterval(State.rotateInterval); State.rotateInterval = null; }
+    const overlay = document.createElement("div");
+    overlay.className = "rivalry-overlay";
+    overlay.innerHTML = `
+      <div class="rivalry-card">
+        <div class="rivalry-eyebrow">A rivalry is brewing</div>
+        <div class="rivalry-headline serif">It's neck and neck</div>
+        <div class="rivalry-pair">
+          <div class="rivalry-side">
+            ${monogram(a.name, "xl", true)}
+            <div class="nm">${escapeHtml(a.name)}</div>
+            <div class="ct">${a.count}</div>
+            <div class="lbl">Tonight</div>
+          </div>
+          <div class="rivalry-vs">vs.</div>
+          <div class="rivalry-side">
+            ${monogram(b.name, "xl", true)}
+            <div class="nm">${escapeHtml(b.name)}</div>
+            <div class="ct">${b.count}</div>
+            <div class="lbl">Tonight</div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    setTimeout(() => {
+      overlay.remove();
+      if (State.role === "tv" && !State.rotateInterval) startTVRotation();
+    }, 5500);
   }
 
   function renderTV() {
@@ -2544,21 +2948,19 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
         </div>
         ${pendingBanner}
         <div class="tv-content">${content}</div>
-        <div class="qr-corner" id="tv-qr">
-          <div class="qr-img" id="tv-qr-img"></div>
-          <div class="qr-label">Scan to join the bar</div>
-          <div class="qr-sub">${escapeHtml(State.barCode || "")}</div>
-        </div>
       </div>
     `;
   }
   function attachTVHandlers() {
     $("#btn-tv-exit")?.addEventListener("click", () => {
       if (State.rotateInterval) clearInterval(State.rotateInterval);
+      if (State.rivalryInterval) clearInterval(State.rivalryInterval);
+      State.rotateInterval = null;
+      State.rivalryInterval = null;
       State.role = null;
       render();
     });
-    // Render the QR code for the join URL
+    // Render the QR code (only present on the leaderboard view)
     renderQRCode();
   }
 
@@ -2609,7 +3011,13 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
 
   function renderTVLeaderboard(session) {
     const tonightCounts = {};
-    (session?.pours || []).forEach(p => { tonightCounts[p.friendId] = (tonightCounts[p.friendId] || 0) + 1; });
+    const tonightCategoryCounts = {}; // friendId → {category: count}
+    (session?.pours || []).forEach(p => {
+      tonightCounts[p.friendId] = (tonightCounts[p.friendId] || 0) + 1;
+      const cat = p.category || "beer_tap";
+      tonightCategoryCounts[p.friendId] = tonightCategoryCounts[p.friendId] || {};
+      tonightCategoryCounts[p.friendId][cat] = (tonightCategoryCounts[p.friendId][cat] || 0) + 1;
+    });
     const lifetimeCounts = {};
     State.barData.sessions.forEach(s => s.pours.forEach(p => { lifetimeCounts[p.friendId] = (lifetimeCounts[p.friendId] || 0) + 1; }));
     const ranked = State.barData.friends
@@ -2617,14 +3025,37 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
       .sort((a, b) => b.tonight - a.tonight || b.lifetime - a.lifetime);
     const maxTonight = Math.max(...ranked.map(r => r.tonight), 1);
 
+    // Pace stat for the leader (drinks per hour)
+    const leader = ranked[0];
+    let leaderPace = null;
+    if (session && leader && leader.tonight > 0) {
+      const elapsedHours = Math.max(0.1, (Date.now() - session.startedAt) / (1000 * 60 * 60));
+      leaderPace = leader.tonight / elapsedHours;
+    }
+
     return `
       <div style="animation: slideUp 0.5s;">
-        ${tvHeading("Tonight", "At the bar", "Ranking of the regulars")}
+        <div class="lb-heading-row">
+          ${tvHeading("Tonight", "At the bar", "Ranking of the regulars")}
+          <div class="lb-qr-card">
+            <div class="qr-img" id="tv-qr-img"></div>
+            <div class="qr-label">Scan to join</div>
+            <div class="qr-sub">${escapeHtml(State.barCode || "")}</div>
+          </div>
+        </div>
         <div class="leaderboard">
           ${ranked.map((f, i) => {
             const widthPct = (f.tonight / maxTonight) * 100;
             const isLeader = i === 0 && f.tonight > 0;
-            const isBart = isPatronABartender(f.id);
+            const isBart = isPatronActivelyBartending(f.id);
+            const cats = tonightCategoryCounts[f.id] || {};
+            const catChips = Object.entries(cats)
+              .sort((a, b) => b[1] - a[1])
+              .map(([cat, count]) => {
+                const spec = DRINK_CATEGORIES[cat];
+                if (!spec) return "";
+                return `<span class="cat-chip"><span class="ic">${spec.icon}</span><span class="ct">${count}</span></span>`;
+              }).join("");
             return `
               <div class="lb-row${isLeader ? " leader" : ""}" style="animation: slideUp 0.4s ${i * 0.06}s both;">
                 <div class="lb-rank num">${i + 1}</div>
@@ -2632,8 +3063,10 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
                 <div>
                   <div class="lb-name-row">
                     <div class="lb-name">${escapeHtml(f.name)}</div>
-                    ${isBart ? '<span class="bartender-tag" title="Bartender for tonight">Bartender</span>' : ''}
+                    ${isBart ? '<span class="bartender-tag" title="Actively bartending">Bartender</span>' : ''}
+                    ${isLeader && leaderPace !== null ? `<span class="pace-badge">${leaderPace.toFixed(1)}/hr</span>` : ''}
                   </div>
+                  ${catChips ? `<div class="category-chips">${catChips}</div>` : ''}
                   <div class="lb-bar-track"><div class="lb-bar-fill" style="width: ${widthPct}%; animation-delay: ${i * 0.08}s;"></div></div>
                 </div>
                 <div class="lb-num-block">
@@ -2835,7 +3268,7 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
         <div class="phone-header">
           <div class="top">
             <div style="min-width: 0;">
-              <h1>${State.isBartender ? "Barkeep's Book" : "The Pool Bar"}</h1>
+              <h1>${State.isBartender ? "Barkeep's Book" : "The Snug"}</h1>
               <div class="status ${session ? "live" : ""}"><span class="dot"></span>${session ? "Active session" : "No session"}</div>
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
@@ -2903,6 +3336,7 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
     const tonightCounts = {};
     (session?.pours || []).forEach(p => { tonightCounts[p.friendId] = (tonightCounts[p.friendId] || 0) + 1; });
 
+    // Spectator view (non-bartenders)
     if (!State.isBartender) {
       const ranked = State.barData.friends
         .map(f => ({ ...f, tonight: tonightCounts[f.id] || 0 }))
@@ -2921,6 +3355,7 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
       `;
     }
 
+    // Step 1: pick a patron
     if (!State.selectedFriend) {
       return `
         <div class="step-label">Who's drinking?</div>
@@ -2939,35 +3374,91 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
 
     const friend = State.barData.friends.find(f => f.id === State.selectedFriend);
     if (!friend) { State.selectedFriend = null; return renderPourTab(session); }
-    return `
-      <button class="back-btn" id="btn-back-friends">${icon("back")}Back to patrons</button>
-      <div class="friend-detail">
-        ${monogram(friend.name, "xl", true)}
-        <div class="nm">${escapeHtml(friend.name)}</div>
-      </div>
-      <div class="step-label">Pick a tap</div>
-      <div>
-        ${[...State.barData.kegs].sort((a,b) => a.tap - b.tap).map(keg => {
-          const fullOz = KEG_SIZES[keg.size].oz;
-          const pct = (keg.remainingOz / fullOz) * 100;
-          const isEmpty = keg.remainingOz < POUR_OZ;
-          return `
-            <button class="keg-pour" ${isEmpty ? "disabled" : ""} data-keg="${keg.id}">
-              <div class="tap-circle">${keg.tap}</div>
-              <div class="info">
-                <div class="nm">${escapeHtml(keg.name)}</div>
-                <div class="meta">${escapeHtml(keg.brewery)} · ${escapeHtml(keg.style)}</div>
-                <div class="track"><div class="fill" style="width: ${pct}%;"></div></div>
-              </div>
-              <div class="right">
-                <div class="pct num">${Math.round(pct)}%</div>
-                ${isEmpty ? '<div class="empty-lbl">Empty</div>' : ''}
-              </div>
+
+    // Step 2: pick a drink category
+    if (!State.pourCategory) {
+      return `
+        <button class="back-btn" id="btn-back-friends">${icon("back")}Back to patrons</button>
+        <div class="friend-detail">
+          ${monogram(friend.name, "xl", true)}
+          <div class="nm">${escapeHtml(friend.name)}</div>
+        </div>
+        <div class="step-label">What are they having?</div>
+        <div class="drink-type-grid">
+          ${Object.entries(DRINK_CATEGORIES).map(([key, spec]) => `
+            <button class="drink-type-btn" data-category="${key}">
+              <div class="icon-big">${spec.icon}</div>
+              <div class="lbl">${escapeHtml(spec.label)}</div>
+              ${spec.deductsKeg ? '<div class="sub">From the taps</div>' : ''}
             </button>
-          `;
-        }).join("")}
-      </div>
-    `;
+          `).join("")}
+        </div>
+      `;
+    }
+
+    const catSpec = DRINK_CATEGORIES[State.pourCategory];
+
+    // Step 3: if beer_tap and no size picked, pick size
+    if (catSpec.needsSize && !State.pourSize) {
+      return `
+        <button class="back-btn" id="btn-back-category">${icon("back")}Back to drink type</button>
+        <div class="friend-detail">
+          ${monogram(friend.name, "xl", true)}
+          <div class="nm">${escapeHtml(friend.name)}</div>
+        </div>
+        <div class="step-label">How much?</div>
+        <div class="size-grid">
+          <button class="size-btn half" data-size="half">
+            <div class="glass-emoji">🍺</div>
+            <div class="lbl">Half pint</div>
+            <div class="sub">8 oz</div>
+          </button>
+          <button class="size-btn full" data-size="full">
+            <div class="glass-emoji">🍺</div>
+            <div class="lbl">Full pint</div>
+            <div class="sub">16 oz</div>
+          </button>
+        </div>
+      `;
+    }
+
+    // Step 4: if beer_tap, pick a keg. Otherwise, the pour happens immediately
+    // (handled in the click handler for the drink-type button).
+    if (catSpec.deductsKeg) {
+      const requiredOz = State.pourSize === "half" ? HALF_POUR_OZ : POUR_OZ;
+      return `
+        <button class="back-btn" id="btn-back-size">${icon("back")}Back to size</button>
+        <div class="friend-detail">
+          ${monogram(friend.name, "xl", true)}
+          <div class="nm">${escapeHtml(friend.name)}</div>
+        </div>
+        <div class="step-label">Pick a tap (${State.pourSize === "half" ? "half pint" : "full pint"})</div>
+        <div>
+          ${[...State.barData.kegs].sort((a,b) => a.tap - b.tap).map(keg => {
+            const fullOz = KEG_SIZES[keg.size].oz;
+            const pct = (keg.remainingOz / fullOz) * 100;
+            const isEmpty = keg.remainingOz < requiredOz;
+            return `
+              <button class="keg-pour" ${isEmpty ? "disabled" : ""} data-keg="${keg.id}">
+                <div class="tap-circle">${keg.tap}</div>
+                <div class="info">
+                  <div class="nm">${escapeHtml(keg.name)}</div>
+                  <div class="meta">${escapeHtml(keg.brewery)} · ${escapeHtml(keg.style)}</div>
+                  <div class="track"><div class="fill" style="width: ${pct}%;"></div></div>
+                </div>
+                <div class="right">
+                  <div class="pct num">${Math.round(pct)}%</div>
+                  ${isEmpty ? '<div class="empty-lbl">Empty</div>' : ''}
+                </div>
+              </button>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    // Should never reach here — fall back
+    return `<div class="step-label">Logging…</div>`;
   }
 
   function renderFriendsTab() {
@@ -2996,7 +3487,9 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
     }
     const myPatronId = getMyPatronId();
     const roster = getBartenderRoster();
+    const amActive = amIActivelyBartending();
     return `
+      ${myPatronId ? renderActiveBartenderCard(amActive) : ''}
       ${myPatronId ? '' : renderPickPatronPrompt()}
       ${renderPendingRequestsSection()}
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
@@ -3006,7 +3499,7 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
       ${State.barData.friends.map(f => {
         const stats = computeFriendStats(f.id);
         const earned = getEarnedAchievements(f.id);
-        const isBart = roster.some(b => b.friendId === f.id);
+        const isBart = isPatronActivelyBartending(f.id);
         const isMe = f.id === myPatronId;
         return `
           <div class="friend-row">
@@ -3022,6 +3515,18 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
           </div>
         `;
       }).join("")}
+    `;
+  }
+
+  function renderActiveBartenderCard(amActive) {
+    return `
+      <div class="bartender-status-card">
+        <div class="info">
+          <div class="lbl">${amActive ? "On duty" : "Off duty"}</div>
+          <div class="desc">${amActive ? "Your name shows as Bartender on the TV." : "Tap to show as Bartender on the TV."}</div>
+        </div>
+        <div class="toggle-switch ${amActive ? "on" : ""}" id="toggle-active-bartender" role="button" aria-label="Toggle active bartender"></div>
+      </div>
     `;
   }
 
@@ -3228,14 +3733,64 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
     $("#btn-end-session")?.addEventListener("click", endSession);
     $("#btn-undo")?.addEventListener("click", undoLastPour);
 
+    // Pour flow: patron → category → (size?) → keg (if beer_tap) → done
     document.querySelectorAll("[data-friend]").forEach(el => {
-      el.addEventListener("click", () => { State.selectedFriend = el.dataset.friend; render(); });
+      el.addEventListener("click", () => {
+        State.selectedFriend = el.dataset.friend;
+        State.pourCategory = null;
+        State.pourSize = null;
+        render();
+      });
     });
-    $("#btn-back-friends")?.addEventListener("click", () => { State.selectedFriend = null; render(); });
+    $("#btn-back-friends")?.addEventListener("click", () => {
+      State.selectedFriend = null;
+      State.pourCategory = null;
+      State.pourSize = null;
+      render();
+    });
+    document.querySelectorAll("[data-category]").forEach(el => {
+      el.addEventListener("click", async () => {
+        const cat = el.dataset.category;
+        const spec = DRINK_CATEGORIES[cat];
+        State.pourCategory = cat;
+        if (!spec.deductsKeg) {
+          // Non-tap drinks log immediately
+          await logPour(State.selectedFriend, { category: cat });
+          State.selectedFriend = null;
+          State.pourCategory = null;
+          State.pourSize = null;
+          render();
+          return;
+        }
+        // beer_tap → continue to size picker
+        render();
+      });
+    });
+    $("#btn-back-category")?.addEventListener("click", () => {
+      State.pourCategory = null;
+      State.pourSize = null;
+      render();
+    });
+    document.querySelectorAll("[data-size]").forEach(el => {
+      el.addEventListener("click", () => {
+        State.pourSize = el.dataset.size;
+        render();
+      });
+    });
+    $("#btn-back-size")?.addEventListener("click", () => {
+      State.pourSize = null;
+      render();
+    });
     document.querySelectorAll("[data-keg]").forEach(el => {
       el.addEventListener("click", async () => {
-        await logPour(State.selectedFriend, el.dataset.keg);
+        await logPour(State.selectedFriend, {
+          category: State.pourCategory || "beer_tap",
+          size: State.pourSize || "full",
+          kegId: el.dataset.keg
+        });
         State.selectedFriend = null;
+        State.pourCategory = null;
+        State.pourSize = null;
         render();
       });
     });
@@ -3285,10 +3840,17 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
         if (!friendId) return;
         linkBtn.disabled = true;
         await setMyPatronId(friendId);
+        // Default to ON so the tag shows immediately
+        await setMyActiveBartending(true);
         showToast("Tagged. You'll show as Bartender on the TV.", "success");
         render();
       });
     }
+
+    // Active-bartender toggle
+    $("#toggle-active-bartender")?.addEventListener("click", async () => {
+      await setMyActiveBartending(!amIActivelyBartending());
+    });
 
     // Pending request handlers
     document.querySelectorAll("[data-approve]").forEach(el => {
@@ -3410,7 +3972,15 @@ apiKey: "AIzaSyBMmmq-4Ae2BpKRlKodEGcBSSRBHeTq3CQ",
       State.barCode = savedCode;
       try {
         const snap = await getDoc(doc(State.db, "bars", savedCode));
-        if (snap.exists()) { subscribeBar(); return; }
+        if (snap.exists()) {
+          subscribeBar();
+          // If we arrived from a successful join, auto-select Spectator mode
+          if (params.get("spectator") === "1") {
+            State.role = "phone";
+            try { window.history.replaceState({}, "", window.location.pathname); } catch {}
+          }
+          return;
+        }
         else { localStorage.removeItem("taphouse_barCode"); State.barCode = null; }
       } catch (e) { console.warn("Couldn't resume saved bar:", e); }
     }
